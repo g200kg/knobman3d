@@ -1,0 +1,2316 @@
+<!doctype html>
+<html>
+<head>
+<title>KnobMan3D</title>
+<link href='http://fonts.googleapis.com/css?family=Audiowide' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
+<style>
+body{
+  background:#333;
+  font-family: Ubuntu;
+  font-size:14px;
+}
+#content{
+  position:relative;
+}
+#header{
+  color:#eee;
+  background:#222;
+  margin:0px;
+  padding:0px;
+}
+#main{
+  position:absolute;
+  top:70px;
+  width:765px;
+  left:0;
+  right:0;
+  margin:auto;
+}
+#exportpane{
+  display:none;
+  position:absolute;
+  top:0px;
+  left:0px;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+}
+#exportframe{
+  position:absolute;
+  left:0px;
+  right:0px;
+  top:0px;
+  bottom:0px;
+  width:64px;
+  height:95%;
+  background:#444;
+  margin:auto;
+  border:2px solid #222;
+  border-radius: 8px;
+}
+#exportframe2{
+  position:absolute;
+  left:10px;
+  top:2%;
+  bottom:0px;
+  height:96%;
+  overflow:auto;
+}
+#exportframe3{
+  position:absolute;
+  top:2%;
+  left:70px;
+  width:120px;
+}
+#exportframe2 > canvas{
+  position:absolute;
+  left:0px;
+  right:0px;
+  margin:auto;
+}
+#exportframe3 > button{
+  display:block;
+  width:100%;
+  margin:2px 0px;
+}
+.explabel{
+  color:white;
+  width:80px;
+}
+#savepane{
+  display:none;
+  position:absolute;
+  top:0px;
+  left:0px;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+}
+#saveframe{
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0;
+  color:#ccc;
+  background:#444;
+  width:95%;
+  height:200px;
+  margin:auto;
+  border:1px solid #888;
+  border-radius:3px;
+  box-shadow:1px 1px 2px 2px rgba(0,0,0,0.4);
+  padding-top:10px;
+}
+#saveurl{
+  width:94%;
+  margin-left:3%;
+}
+#saveclose{
+  width:80px;
+  margin-left:3%;
+}
+
+#dlgpane{
+  display:none;
+  position:absolute;
+  top:0px;
+  left:0px;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+}
+#dlgframe{
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0;
+  color:#ccc;
+  background:#444;
+  width:300px;
+  height:100px;
+  margin:auto;
+  border:1px solid #888;
+  border-radius:3px;
+  box-shadow:1px 1px 2px 2px rgba(0,0,0,0.4);
+  text-align: center;
+  padding-top:10px;
+}
+#menupane{
+  color:#ccc;
+}
+.panetitle{
+  height:20px;
+  font-weight: bold;
+  color:#fff;
+  padding:0px 15px;
+}
+#lypane{
+  background:#444;
+  width:280px;
+  height:100%;
+  margin:0px;
+  padding:5px;
+  display:block;
+  overflow:auto;
+}
+#lybase{
+  position:absolute;
+  top:20px;
+  left:0px;
+  width:140px;
+  color:#ccc;
+  background:#666;
+  border-radius:3px;
+  box-shadow:1px 1px 2px 2px rgba(0,0,0,0.4);
+  border:1px solid #888;
+  margin:5px;
+  padding:0px;
+  overflow:hidden;
+}
+#primpane{
+  background:#444;
+  width:280px;
+  height:100%;
+  margin:0px;
+  padding:5px;
+  display:block;
+  overflow:auto;
+}
+#primbase{
+  position:absolute;
+  top:20px;
+  left:150px;
+  width:290px;
+  color:#ccc;
+  background:#666;
+  border-radius:3px;
+  box-shadow:1px 1px 2px 2px rgba(0,0,0,0.4);
+  border:1px solid #888;
+  margin:5px;
+  padding:0px;
+  overflow:hidden;
+}
+#prevpane{
+  background:#444;
+  width:590px;
+  height:100%;
+  margin:0px;
+  padding:5px;
+  display:block;
+  overflow:auto;
+}
+#prevpane2{
+  position:absolute;
+  top:40px;
+  left:320px;
+}
+#prevbase {
+  position:absolute;
+  top:20px;
+  left:150px;
+  width:600px;
+  height:305px;
+  color:#ccc;
+  background:#666;
+  border-radius:3px;
+  box-shadow:1px 1px 2px 2px rgba(0,0,0,0.4);
+  border:1px solid #888;
+  margin:5px;
+  padding:0px;
+  overflow:hidden;
+}
+#effbase{
+  position:absolute;
+  top:20px;
+  left:450px;
+  width:300px;
+  color:#ccc;
+  background:#666;
+  border-radius:3px;
+  box-shadow:1px 1px 2px 2px rgba(0,0,0,0.4);
+  border:1px solid #888;
+  margin:5px;
+  padding:0px;
+  overflow:hidden;
+}
+#effpane{
+  background:#444;
+  width:290px;
+  height:100%;
+  margin:0px;
+  padding:5px;
+  display:block;
+  overflow:auto;
+}
+#lightbase{
+  position:absolute;
+  top:20px;
+  left:450px;
+  width:300px;
+  color:#ccc;
+  background:#666;
+  border-radius:3px;
+  box-shadow:1px 1px 2px 2px rgba(0,0,0,0.4);
+  border:1px solid #888;
+  margin:5px;
+  padding:0px;
+  overflow:hidden;
+}
+#lightpane{
+  background:#444;
+  width:290px;
+  height:100%;
+  margin:0px;
+  padding:5px;
+  display:block;
+  overflow:auto;
+}
+.lyrow{
+  display:none;
+  cursor:default;
+}
+.spin{
+  display:inline-block;
+  background-image:url(images/spin.svg);
+  background-repeat:no-repeat;
+  background-position:center;
+  border:#000 solid 1px;
+  vertical-align:middle;
+  width:22px;
+  height:20px;
+  margin:0px;
+  padding:0px;
+}
+.primrow, .effrow {
+  height:24px;
+  background:#444;
+  margin:0px;
+  padding:0px;
+}
+.primlabel {
+  display:inline-block;
+  vertical-align:middle;
+  text-align: center;
+  width:110px;
+  height:22px;
+  color:#ccc;
+}
+.efflabel {
+  display:inline-block;
+  vertical-align:middle;
+  text-align: center;
+  width:80px;
+  height:22px;
+  color:#ccc;
+  margin:0px;
+  padding:0px;
+}
+.primrow > input {
+    display:inline;
+    text-align:center;
+    vertical-align:middle;
+    height:16px;
+    line-height:16px;
+    margin:0px;
+    padding:0px;
+}
+.effrow > input {
+  display:inline-block;
+  text-align:center;
+  vertical-align:middle;
+  height:16px;
+  width:40px;
+  line-height:16px;
+  margin:0px;
+  padding:0px;
+}
+.primrow > select {
+  display:inline-block;
+  text-align:center;
+  vertical-align:middle;
+  line-height:18px;
+  margin:0px;
+  padding:0px;
+  width:130px;
+}
+</style>
+<script src="three.min.js"></script>
+<script src="threeCSG.js"></script>
+<script>
+var app;
+var layermax=16;
+var initload;
+
+function Col(r, g, b) {
+  if(typeof(g)=="undefined"){
+    this.r=r>>16;
+    this.g=(r>>8)&0xff;
+    this.b=r&0xff;
+  }
+  else{
+    this.r = r;
+    this.g = g;
+    this.b = b;
+  }
+  this.a=255;
+  this.h = 0;
+  this.l = 0;
+  this.s = 0;
+  this.cnt = 0;
+  this.Clone=function(){
+      var c=new Col(this.r,this.g,this.b);
+      c.a=this.a;
+      c.h=this.h;
+      c.l=this.l;
+      c.s=this.s;
+      return c;
+  };
+  this.GetColStr = function() {
+      return "#" + ("00" + (this.r | 0).toString(16)).substr(-2)
+           + ("00" + (this.g | 0).toString(16)).substr(-2)
+           + ("00" + (this.b | 0).toString(16)).substr(-2);
+  };
+  this.GetColor24=function(){
+      return ((this.r|0)<<16)+((this.g|0)<<8)+(this.b|0);
+  };
+  this.SetRgb = function(r, g, b) {
+      if(typeof(g)=="undefined"){
+        this.r = (r>>16)&0xff;
+        this.g = (r>>8)&0xff;
+        this.b = r&0xff;
+        this.rgbtohls();
+        return;
+      }
+      this.r = r;
+      this.g = g;
+      this.b = b;
+      this.rgbtohls();
+  };
+  this.SetCol = function(c) {
+      this.r = c.r;
+      this.g = c.g;
+      this.b = c.b;
+      this.a = c.a;
+      this.h = c.h;
+      this.l = c.l;
+      this.s = c.s;
+  };
+  this.htorgb = function(n1, n2, h) {
+      while(h < 0)
+        h += 240;
+      while(h > 240)
+        h -= 240;
+      if(h < (240 / 6))
+        return (n1 + (((n2 - n1) * h + (240 / 12)) / (240 / 6)));
+      if(h < (240 / 2))
+        return (n2);
+      if(h < ((240 * 2) / 3))
+        return (n1 + (((n2 - n1) * (((240 * 2) / 3) - h) + (240 / 12)) / (240 / 6)));
+      else
+        return (n1);
+  };
+  this.SetHls = function(h, l, s) {
+      var tmp1, tmp2;
+      this.h = h;
+      this.l = l;
+      this.s = s;
+      if(l > 240) l = 240;
+      if (l < 0) l = 0;
+      if (s > 240) s = 240;
+      if (s <= 0)
+        this.r = this.g = this.b = l * 255 / 240;
+      else {
+        if (l <= 120)
+            tmp2 = (l * (240 + s) + 120) / 240;
+        else
+            tmp2 = l + s - ((l * s) + 120) / 240;
+        tmp1 = 2 * l - tmp2;
+        this.r = (this.htorgb(tmp1, tmp2, h + (240 / 3)) * 255 + (240 / 2)) / 240;
+        this.g = (this.htorgb(tmp1, tmp2, h) * 255 + (240 / 2)) / 240;
+        this.b = (this.htorgb(tmp1, tmp2, h - (240 / 3)) * 255 + (240 / 2)) / 240;
+      }
+  };
+  this.hlstorgb=function(){
+    this.SetHls(this.h,this.l,this.s);
+  }
+  this.rgbtohls = function() {
+        var cmax=Math.max(Math.max(this.r, this.g), this.b);
+        var cmin=Math.min(Math.min(this.r, this.g), this.b);
+        this.l=((cmax+cmin) * 240 + 255) / (2 * 255);
+        if(cmax == cmin) {
+            this.h = this.s = 0;
+        }
+        else {
+          if(this.l<120)
+            this.s=((cmax-cmin)*240 + (cmax + cmin) / 2) / (cmax + cmin);
+          else
+            this.s=((cmax-cmin) * 240 + ((2 * 255 - cmax - cmin) / 2)) / (2 * 255 - cmax - cmin);
+          rr=(((cmax-this.r)*40) + (cmax - cmin) / 2) / (cmax - cmin);
+          gg=(((cmax-this.g)*40) + (cmax - cmin) / 2) / (cmax - cmin);
+          bb=(((cmax-this.b)*40) + (cmax - cmin) / 2) / (cmax - cmin);
+        if(this.r==cmax)
+          this.h=bb-gg;
+        else if(this.g==cmax)
+          this.h=80+rr-bb;
+        else
+          this.h=160+gg-rr;
+        if(this.h<0)
+          this.h+=240;
+        if(this.h>240)
+          this.h-=240;
+      }
+  }
+  this.ChangeBrightness=function(n){
+    this.l=Math.max(0, Math.min(239, this.l+n*240/100));
+    this.hlstorgb();
+    return this;
+  }
+  this.ChangeHue=function(n){
+    this.h=this.h+n*240/100;
+    if(this.h>=240) this.h-=240;
+    if(this.h<0) this.h+=240;
+    this.hlstorgb();
+    return this;
+  }
+  this.ChangeColor=function(b,h){
+    this.h=this.h+h*240/360;
+    if(this.h>=240) this.h-=240;
+    if(this.h<0) this.h+=240;
+    this.l=Math.max(0, Math.min(239, this.l+b*240/100));
+    this.hlstorgb();
+    return this;
+  }
+/*
+  this.ChangeBrightness = function(n) {
+    n=n*255/100;
+    this.r += n;
+    this.r = Math.max(0, Math.min(255, this.r));
+    this.g += n;
+    this.g = Math.max(0, Math.min(255, this.g));
+    this.b += n;
+    this.b = Math.max(0, Math.min(255, this.b));
+    return this;
+  }
+*/
+  this.BlendTo=function(r,g,b,a) {
+        this.r=(this.r*(256-a)+r*a)/256;
+        this.g=(this.g*(256-a)+g*a)/256;
+        this.b=(this.b*(256-a)+b*a)/256;
+  }
+  this.Bright=function(a) {
+        this.r=this.r*a/255;
+        this.g=this.g*a/255;
+        this.b=this.b*a/255;
+  }
+  this.Copy = function(c) {
+        this.r = c.r;
+        this.g = c.g;
+        this.b = c.b;
+        this.a = c.a;
+  }
+  this.Blend4 = function(c01, c10, c11, x, y) {
+        var a0, a1;
+        a0 = this.r + (c01.r - this.r) * x;
+        a1 = c10.r + (c11.r - c10.r) * x;
+        this.r = a0 + (a1 - a0) * y;
+        a0 = this.g + (c01.g - this.g) * x;
+        a1 = c10.g + (c11.g - c10.g) * x;
+        this.g = a0 + (a1 - a0) * y;
+        a0 = this.b + (c01.b - this.b) * x;
+        a1 = c10.b + (c11.b - c10.b) * x;
+        this.b = a0 + (a1 - a0) * y;
+        a0 = this.a + (c01.a - this.a) * x;
+        a1 = c10.a + (c11.a - c10.a) * x;
+        this.a = a0 + (a1 - a0) * y;
+  }
+  this.Conv = function(b, c, s, h) {
+        h *= (240 / 360);
+        this.rgbtohls();
+        this.l = (this.l - 120) * (c + 100) / 100 + 120;
+        this.l += b * 240 / 100;
+        if (this.l >= 240)
+            this.l = 239;
+        if (this.l < 0)
+            this.l = 0;
+        this.s = this.s * (s + 100) / 100;
+        this.h += h;
+        this.SetHls(this.h, this.l, this.s);
+  }
+  this.GetPix = function(img, p) {
+        this.r = img.data[p];
+        this.g = img.data[p + 1];
+        this.b = img.data[p + 2];
+        this.a = img.data[p + 3];
+  }
+  this.SetPix = function(img, p) {
+        img.data[p] = this.r;
+        img.data[p + 1] = this.g;
+        img.data[p + 2] = this.b;
+        img.data[p + 3] = this.a;
+  }
+  this.AddPix = function(img, p) {
+        if (this.a >= 255 || img.data[p + 3] == 0)
+            this.SetPix(img, p);
+        else {
+            var r = this.a / 255;
+            img.data[p] += (this.r - img.data[p]) * r;
+            img.data[p + 1] += (this.g - img.data[p + 1]) * r;
+            img.data[p + 2] += (this.b - img.data[p + 2]) * r;
+            img.data[p + 3] += (255 - img.data[p + 3]) * r;
+        }
+  }
+  this.MulAddPix = function(img, imgMask,pD,pM) {
+        if (this.a <= 0)
+            return;
+        this.a = this.a * imgMask.data[pM + 3] / 255;
+        if (this.a >= 255 || img.data[pD + 3] == 0)
+            this.SetPix(img, pD);
+        else {
+            var r = this.a / 255;
+            img.data[pD] += (this.r - img.data[pD]) * r;
+            img.data[pD + 1] += (this.g - img.data[pD + 1]) * r;
+            img.data[pD + 2] += (this.b - img.data[pD + 2]) * r;
+            img.data[pD + 3] += (255 - img.data[pD + 3]) * r;
+        }
+  }
+  this.Reset = function() {
+        this.r=this.g=this.b=this.a=this.cnt=0;
+  }
+  this.AddVal=function(img,x,y) {
+        p=(img.width*y+x)*4;
+        this.r+=img.data[p];
+        this.g+=img.data[p+1];
+        this.b+=img.data[p+2];
+        this.a+=img.data[p+3];
+        ++this.cnt;
+  }
+  this.SetAve=function(img,x,y) {
+        p=(img.width*y+x)*4;
+        img.data[p]=this.r/this.cnt;
+        img.data[p+1]=this.g/this.cnt;
+        img.data[p+2]=this.b/this.cnt;
+        img.data[p+3]=this.a/this.cnt;
+  }
+  this.rgbtohls();
+}
+function ColorPicker(){
+  this.SetColorBar=function(c) {
+    var h=c.h;
+    var s=c.s;
+    var col=new Col(0, 0, 0);
+    var p=0;
+    for(var y=0; y<120; ++y) {
+        col.SetHls(h, (119-y)*2, s);
+        for (var x=0; x<16; ++x) {
+            this.imgColorbar.data[p]=col.r;
+            this.imgColorbar.data[p + 1]=col.g;
+            this.imgColorbar.data[p + 2]=col.b;
+            this.imgColorbar.data[p + 3]=255;
+            p+=4;
+        }
+    }
+    this.ctxColorMap.putImageData(this.imgColorbar, 136, 0);
+  };
+  this.element=document.createElement("div");
+  this.element.innerHTML="<div style='position:relative;width:250px;height:200px'>"
+    +"<button style='position:absolute;right:4px;width:120px'>#808080</button><br/>"
+    +"<canvas width='152' height='120' style='position:absolute;left:4px;top:26px'></canvas>"
+    +"<div style='position:absolute;top:22px;right:4px'>H : <input type='text' size='4' style='text-align:center' onchange='this.picker.SetHls(event)'/></div>"
+    +"<div style='position:absolute;top:44px;right:4px'>L : <input type='text' size='4' style='text-align:center' onchange='this.picker.SetHls(event)'/></div>"
+    +"<div style='position:absolute;top:66px;right:4px'>S : <input type='text' size='4' style='text-align:center' onchange='this.picker.SetHls(event)'/></div>"
+    +"<div style='position:absolute;top:88px;right:4px'>R : <input type='text' size='4' style='text-align:center' onchange='this.picker.SetRgb(event)'/></div>"
+    +"<div style='position:absolute;top:110px;right:4px'>G : <input type='text' size='4' style='text-align:center' onchange='this.picker.SetRgb(event)'/></div>"
+    +"<div style='position:absolute;top:132px;right:4px'>B : <input type='text' size='4' style='text-align:center' onchange='this.picker.SetRgb(event)'/></div>"
+    +"</div>";
+  this.button=this.element.childNodes[0].childNodes[0];
+  this.colormap=this.element.childNodes[0].childNodes[2];
+  this.paramH=this.element.childNodes[0].childNodes[3].childNodes[1];
+  this.paramL=this.element.childNodes[0].childNodes[4].childNodes[1];
+  this.paramS=this.element.childNodes[0].childNodes[5].childNodes[1];
+  this.paramR=this.element.childNodes[0].childNodes[6].childNodes[1];
+  this.paramG=this.element.childNodes[0].childNodes[7].childNodes[1];
+  this.paramB=this.element.childNodes[0].childNodes[8].childNodes[1];
+  this.paramH.picker=this.paramL.picker=this.paramS.picker=this.paramR.picker=this.paramG.picker=this.paramB.picker=this;
+  this.SetHls=function(e){
+    this.curColor.SetHls(parseInt(this.paramH.value),parseInt(this.paramL.value),parseInt(this.paramS.value));
+    this.UpdateCurColor();
+    if(this.callback)
+      this.callback(this.curColor);
+  }
+  this.SetRgb=function(e){
+    this.curColor.SetRgb(parseInt(this.paramR.value),parseInt(this.paramG.value),parseInt(this.paramB.value));
+    this.UpdateCurColor();
+    if(this.callback)
+      this.callback(this.curColor);
+  }
+/*  this.colormap=document.createElement("canvas");
+  this.colormap.setAttribute("width",120+32);
+  this.colormap.setAttribute("height",120);
+  this.button=document.createElement("button");
+  this.button.innerHTML="#808080";
+  this.element.appendChild(document.createTextNode("Color : "));
+  this.element.appendChild(this.button);
+  this.element.appendChild(document.createElement("br"));
+  this.element.appendChild(this.colormap);
+  this.values=document.createElement("div");
+  this.element.appendChild(this.values);
+  this.values.innerHTML="H: <input type='text' size='4' style='position:absolute;top:0;right:0'/> L: <input type='text' size='4'/> S: <input type='text' size='4'/>";
+*/
+  this.colormap.picker=this;
+  this.ctxColorMap=this.colormap.getContext("2d");
+  this.imgColorMap=this.ctxColorMap.getImageData(0, 0, 120, 120);
+  this.imgColorbar=this.ctxColorMap.getImageData(136, 0, 16, 120);
+  this.callback=null;
+  this.curColor=new Col(192,128,128);
+  var col=new Col(0, 0, 0);
+  var p=0;
+  for(var y=0; y<120; ++y) {
+    for(var x=0; x<120; ++x) {
+      col.SetHls(x*2, 120, 238-y*2);
+      this.imgColorMap.data[p] = col.r;
+      this.imgColorMap.data[p+1] = col.g;
+      this.imgColorMap.data[p+2] = col.b;
+      this.imgColorMap.data[p+3] = 255;
+      p += 4;
+    }
+  }
+  this.ctxColorMap.putImageData(this.imgColorMap, 0, 0);
+  this.SetColorBar(new Col(255,0,0));
+  this.SetCurColor=function(c){
+    this.curColor.SetRgb(c);
+    this.UpdateCurColor();
+  };
+  this.UpdateCurColor=function(){
+    this.SetColorBar(this.curColor);
+    var s=this.curColor.GetColStr();
+    this.button.innerHTML=s;
+    this.button.style.background=s;
+    if(this.curColor.l>120)
+      this.button.style.color="#000";
+    else
+      this.button.style.color="#fff";
+    this.paramH.value=this.curColor.h|0;
+    this.paramL.value=this.curColor.l|0;
+    this.paramS.value=this.curColor.s|0;
+    this.paramR.value=this.curColor.r|0;
+    this.paramG.value=this.curColor.g|0;
+    this.paramB.value=this.curColor.b|0;
+    this.ctxColorMap.fillStyle="#444";
+    this.ctxColorMap.fillRect(120,0,16,120);
+    this.ctxColorMap.fillStyle="#fff";
+    this.ctxColorMap.fillRect(125,119-this.curColor.l*.5,16,3);
+    this.ctxColorMap.putImageData(this.imgColorMap, 0, 0);
+    this.ctxColorMap.fillRect(this.curColor.h*.5,0,1,120);
+    this.ctxColorMap.fillRect(0,119-this.curColor.s*.5,120,1);
+  };
+  this.SetMap=function(pos){
+    this.curColor.SetHls(this.curColor.h=Math.min(238,pos.x*2), this.curColor.l, this.curColor.s = (120 - pos.y) * 2);
+    this.SetColorBar(this.curColor);
+    this.UpdateCurColor();
+    if(this.callback)
+      this.callback(this.curColor);
+  };
+  this.SetBar=function(pos){
+    this.curColor.SetHls(this.curColor.h, this.curColor.l=238-pos.y*2, this.curColor.s);
+    this.UpdateCurColor();
+    if(this.callback)
+      this.callback(this.curColor);
+  };
+  this.GetPos=function(e){
+    var rc = e.target.getBoundingClientRect();
+    return {x:Math.floor(e.clientX - rc.left), y:Math.floor(e.clientY - rc.top)};
+  };
+  this.colormap.onmousedown=function(e){
+    var pos=this.picker.GetPos(e);
+    if(pos.x>=120){
+      this.picker.dragmode=2;
+      this.picker.SetBar(pos);
+    }
+    else{
+      this.picker.dragmode=1;
+      this.picker.SetMap(pos);
+    }
+    e.preventDefault();
+  };
+  this.colormap.onmousemove=function(e){
+    if(this.picker.dragmode){
+      if(e.buttons==0)
+        this.picker.dragmode=0;
+      var pos=this.picker.GetPos(e);
+      switch(this.picker.dragmode){
+      case 1:
+        this.picker.SetMap(pos);
+        break;
+      case 2:
+        this.picker.SetBar(pos);
+        break;
+      }
+    }
+    e.preventDefault();
+  };
+  this.colormap.onmouseup=function(e){
+    this.picker.dragmode=0;
+  };
+  this.colormap.onmouseout=function(e){
+  }
+}
+function Primitive(app,ly){
+  this.app=app;
+  this.layer=ly;
+  this.type="none";
+  this.height=10+ly.num*10;
+  this._div=16;
+  this._divh=16;
+  this._nv=(this._div+1)*4;
+  this._rx=1;
+  this._ry=1;
+  this._lx=0;
+  this._ly=0;
+  this.emboss=0;
+  this.embossdiffuse=0;
+  this.textype="bump";
+  this.texture="Aura";
+  this.texdepth=0;
+  this.texzoom=100;
+  this.round=0;
+  this.wave=0;
+  this.waveangle=4;
+  this.color=0xff8080;
+  this.aspect=0;
+  this.shininess=30;
+  this.metalic=0;
+//  this.mx=new THREE.Matrix4();
+  this.Rebuild=function(){
+    if(this.mesh){
+      this.app.scene.remove(this.mesh);
+      this.app.scene.remove(this.rot);
+      this.geometry.dispose();
+      this.material.dispose();
+    }
+    this.Build();
+  }
+  this.Build=function(){
+    var i,j;
+    this.uvstack=[];
+    this.geometry=new THREE.Geometry();
+    var vtx=this.geometry.vertices;
+    var faces=this.geometry.faces;
+    var uvs=this.geometry.faceVertexUvs[0];
+    for(i=(this._div+1)*(this._divh+1)*4+4;i;--i){
+      vtx.push(new THREE.Vector3(0,0,1));
+      this.uvstack.push(new THREE.Vector2(0.5,0.5));
+    }
+    for(i=0;i<=this._div;++i)
+      var th=i/this._div*Math.PI/2;
+    for(i=0;i<this._div;++i){
+      faces.push(new THREE.Face3(0,i+5,i+4,new THREE.Vector3(0,0,1).normalize()));
+      uvs.push([this.uvstack[0],this.uvstack[i+5],this.uvstack[i+4]]);
+    }
+    for(i=0;i<this._div;++i){
+      faces.push(new THREE.Face3(1,i+this._div+6,i+this._div+5,new THREE.Vector3(0,0,1).normalize()));
+      uvs.push([this.uvstack[1],this.uvstack[i+this._div+6],this.uvstack[i+this._div+5]]);
+    }
+    for(i=0;i<this._div;++i){
+      faces.push(new THREE.Face3(2,i+this._div*2+7,i+this._div*2+6,new THREE.Vector3(0,0,1).normalize()));
+      uvs.push([this.uvstack[2],this.uvstack[i+this._div*2+7],this.uvstack[i+this._div*2+6]]);
+    }
+    for(i=0;i<this._div;++i){
+      faces.push(new THREE.Face3(3,i+this._div*3+8,i+this._div*3+7,new THREE.Vector3(0,0,1).normalize()));
+      uvs.push([this.uvstack[3],this.uvstack[i+this._div*3+8],this.uvstack[i+this._div*3+7]]);
+    }
+    for(j=0;j<this._divh;++j){
+      var n=j*this._nv;
+      for(i=0;i<(this._div)*4+3;++i){
+        faces.push(new THREE.Face3(i+4+n,i+5+n+this._nv,i+4+n+this._nv,new THREE.Vector3(0,0,1).normalize()));
+        uvs.push([this.uvstack[i+4+n],this.uvstack[i+5+n+this._nv],this.uvstack[i+4+n+this._nv]]);
+        faces.push(new THREE.Face3(i+4+n,i+5+n,i+5+n+this._nv,new THREE.Vector3(0,0,1).normalize()));
+        uvs.push([this.uvstack[i+4+n],this.uvstack[i+5+n],this.uvstack[i+5+n+this._nv]]);
+      }
+      faces.push(new THREE.Face3(i+4+n,4+n+this._nv,i+4+n+this._nv,new THREE.Vector3(0,0,1).normalize()));
+      uvs.push([this.uvstack[i+4+n],this.uvstack[4+n+this._nv],this.uvstack[i+4+n+this._nv]]);
+      faces.push(new THREE.Face3(i+4+n,4+n,4+n+this._nv,new THREE.Vector3(0,0,1).normalize()));
+      uvs.push([this.uvstack[i+4+n],this.uvstack[4+n],this.uvstack[4+n+this._nv]]);
+    }
+
+    faces.push(new THREE.Face3(0,4,this._div*4+7));
+    uvs.push([this.uvstack[0],this.uvstack[4],this.uvstack[this._div*4+7]]);
+    faces.push(new THREE.Face3(0,this._div*4+7,3));
+    uvs.push([this.uvstack[0],this.uvstack[this._div*4+7],this.uvstack[3]]);
+    faces.push(new THREE.Face3(1,4+this._div+1,4+this._div));
+    uvs.push([this.uvstack[1],this.uvstack[4+this._div+1],this.uvstack[4+this._div]]);
+    faces.push(new THREE.Face3(1,4+this._div,0));
+    uvs.push([this.uvstack[1],this.uvstack[4+this._div],this.uvstack[0]]);
+    faces.push(new THREE.Face3(2,4+this._div*2+2,4+this._div*2+1));
+    uvs.push([this.uvstack[2],this.uvstack[4+this._div*2+2],this.uvstack[4+this._div*2+1]]);
+    faces.push(new THREE.Face3(2,4+this._div*2+1,1));
+    uvs.push([this.uvstack[2],this.uvstack[4+this._div*2+1],this.uvstack[1]]);
+    faces.push(new THREE.Face3(3,4+this._div*3+3,4+this._div*3+2));
+    uvs.push([this.uvstack[3],this.uvstack[4+this._div*3+3],this.uvstack[4+this._div*3+2]]);
+    faces.push(new THREE.Face3(3,4+this._div*3+2,2));
+    uvs.push([this.uvstack[3],this.uvstack[4+this._div*3+2],this.uvstack[2]]);
+    faces.push(new THREE.Face3(0,2,1));
+    uvs.push([this.uvstack[0],this.uvstack[2],this.uvstack[1]]);
+    faces.push(new THREE.Face3(2,0,3));
+    uvs.push([this.uvstack[2],this.uvstack[0],this.uvstack[3]]);
+    switch(this.textype){
+    case "bump":
+      this.material=new THREE.MeshPhongMaterial( { color:this.color, bumpMap:this.app.texture[this.texture].tex, transparent:true } );
+//      console.log(this.material);
+      break;
+    case "normal":
+      this.material=new THREE.MeshPhongMaterial( { color:this.color, map:this.app.texture[this.texture].tex, transparent:true } );
+      break;
+    }
+    this.material.bumpScale=this.texdepth*.05;
+    this.material.shininess=this.shininess;
+    this.material.shading = THREE.FlatShading;
+    if(this.metalic>=50){
+      this.material.specular = this.material.color;
+      this.material.metal=true;
+    }
+    else{
+      this.material.specular = new THREE.Color(0x808080);
+      this.material.metal=false;
+    }
+//    this.material.metal=true;
+//    this.material.metal=true;
+//    this.meterial.emissive=true;
+    switch(this.type){
+    case "none":
+      this.mesh=null;
+      break;
+    case "cylinder":
+    case "cube":
+      this.mesh=new THREE.Mesh( this.geometry, this.material );
+      this.mesh.position.set(0,0,0);
+      break;
+    }
+    if(this.mesh){
+      this.rot=new THREE.Object3D();
+      this.mesh.castShadow=true;
+      this.mesh.receiveShadow=true;
+      this.mesh.scale.x=this.mesh.scale.y=100;
+      if(this.layer.eff){
+        this.layer.eff.Apply(this.curRatio);
+      }
+      this.app.scene.add(this.rot);
+      this.rot.add(this.mesh);
+    }
+  };
+  this.GetBezier=function(t,x1,y1,x2,y2,x3,y3){
+    var tp=1-t;
+    var x=t*t*x3+2*t*tp*x2+tp*tp*x1;
+    var y=t*t*y3+2*t*tp*y2+tp*tp*y1;
+    return [x,y];
+  };
+  this.MatSetup=function(){
+    this.material.bumpScale=this.texdepth*.05;
+    this.material.shininess=this.shininess;
+//    this.material.color=this.color;
+  }
+  this.MeshSetup=function(){
+    switch(this.type){
+    case "cylinder":
+      this._lx=this._ly=0;
+      if(this.aspect>=0){
+        this._rx=.5-.5*this.aspect/100;
+        this._ry=.5;
+      }
+      else{
+        this._rx=.5;
+        this._ry=.5+.5*this.aspect/100;
+      }
+      break;
+    case "cube":
+      var px=1,py=1;
+      if(this.aspect>=0)
+        px=1-this.aspect/100;
+      else
+        py=1+this.aspect/100;
+      this._lx=Math.max(0,px-this.round/100);
+      this._ly=Math.max(0,py-this.round/100);
+      this._rx=this.round/200+0.001;
+      this._ry=this.round/200+0.001;
+      break;
+    }
+    var vtx=this.geometry.vertices;
+    var uvs=this.uvstack;
+//    var uvs=this.geometry.faceVertexUvs[0];
+//    console.log(uvs)
+    var emb=1-this.emboss/100;
+    var embd=this.embossdiffuse/100;
+    var lx2=this._lx/2;
+    var ly2=this._ly/2;
+    var lx=lx2*emb;
+    var ly=ly2*emb;
+//    var lx1=lx+(lx2-lx)*embd;
+//    var ly1=ly+(ly2-ly)*embd;
+    var rx2=this._rx;
+    var ry2=this._ry;
+    var rx=rx2*emb;
+    var ry=ry2*emb;
+//    var rx1=rx+(rx2-rx)*embd;
+//    var ry1=ry+(ry2-ry)*embd;
+    var nv=this._nv;
+    var tz=.5/(this.texzoom*0.01);
+    vtx[2].x=vtx[3].x=-(vtx[0].x=vtx[1].x=lx);
+    vtx[1].y=vtx[2].y=-(vtx[0].y=vtx[3].y=ly);
+
+    vtx[2].x=vtx[3].x=-(vtx[0].x=vtx[1].x=0);
+    vtx[1].y=vtx[2].y=-(vtx[0].y=vtx[3].y=0);
+    uvs[0].x=uvs[1].x=uvs[2].x=uvs[3].x=.5;
+    uvs[0].y=uvs[1].y=uvs[2].y=uvs[3].y=.5;
+
+
+    vtx[0].z=vtx[1].z=vtx[2].z=vtx[3].z=this.height;
+//  uvs[0].x=uvs[1].x=.5+lx*tz;
+//    uvs[2].x=uvs[3].x=.5-lx*tz;
+//    uvs[0].y=uvs[3].y=.5+ly*tz;
+//    uvs[1].y=uvs[2].y=.5-ly*tz;
+    var v1,v2,v3,v4,u1,u2,u3,u4;
+    for(i=0;i<=this._div;++i){
+      var th=i*Math.PI*0.5/this._div;
+      var wf=this.waveangle;
+      var w1=1+this.wave*.01*Math.cos(th*wf);
+      var w2=1+this.wave*.01*Math.cos((th+Math.PI*.5)*wf);
+      var w3=1+this.wave*.01*Math.cos((th+Math.PI)*wf);
+      var w4=1+this.wave*.01*Math.cos((th+Math.PI*1.5)*wf);
+      for(j=0;j<=this._divh;++j){
+        idx=i+j*nv;
+        v1=vtx[4+idx];
+        v2=vtx[5+this._div+idx];
+        v3=vtx[6+this._div*2+idx];
+        v4=vtx[7+this._div*3+idx];
+        u1=uvs[4+idx];
+        u2=uvs[5+this._div+idx];
+        u3=uvs[6+this._div*2+idx];
+        u4=uvs[7+this._div*3+idx];
+        if(j==this._divh){
+          u1.x=.5+(v1.x=(w1*rx2*Math.sin(th)+lx2))*tz; u1.y=.5+(v1.y=(w1*ry2*Math.cos(th)+ly2))*tz; v1.z=0;
+          u2.x=.5+(v2.x=(w2*rx2*Math.cos(th)+lx2))*tz; u2.y=.5+(v2.y=(w2*-ry2*Math.sin(th)-ly2))*tz; v2.z=0;
+          u3.x=.5+(v3.x=(w3*-rx2*Math.sin(th)-lx2))*tz; u3.y=.5+(v3.y=(w3*-ry2*Math.cos(th)-ly2))*tz; v3.z=0;
+          u4.x=.5+(v4.x=(w4*-rx2*Math.cos(th)-lx2))*tz; u4.y=.5+(v4.y=(w4*ry2*Math.sin(th)+ly2))*tz; v4.z=0;
+        }
+        else{
+/*          if(j==0){
+            u1.x=(1+(v1.x=rx*Math.sin(th)+lx))*.5; u1.y=(1+(v1.y=ry*Math.cos(th)+ly))*.5; v1.z=this.height;
+            u2.x=(1+(v2.x=rx*Math.cos(th)+lx))*.5; u2.y=(1+(v2.y=-ry*Math.sin(th)-ly))*.5; v2.z=this.height;
+            u3.x=(1+(v3.x=-rx*Math.sin(th)-lx))*.5; u3.y=(1+(v3.y=-ry*Math.cos(th)-ly))*.5; v3.z=this.height;
+            u4.x=(1+(v4.x=-rx*Math.cos(th)-lx))*.5; u4.y=(1+(v4.y=ry*Math.sin(th)+ly))*.5; v4.z=this.height;
+          }*/
+//          (emb*(1-embd),  this.height) - (emb,this.height) - (emb+(1-emb)*embd ,this.height*(1-embd))
+          var ratio=j/(this._divh-1);
+          var q=this.GetBezier(ratio,emb*(1-embd),this.height, emb,this.height,  (emb+(1-emb)*embd),this.height*(1-embd));
+          var rrx,rry,llx,lly,hh;
+          rrx=rx+(rx2-rx)*q[0]; rry=ry+(ry2-ry)*q[0];
+          llx=lx+(lx2-lx)*q[0]; lly=ly+(ly2-ly)*q[0];
+          rrx=rx2*q[0]; rry=ry2*q[0];
+          llx=lx2*q[0]; lly=ly2*q[0];
+          hh=q[1];
+          u1.x=.5+(v1.x=w1*rrx*Math.sin(th)+llx)*tz; u1.y=.5+(v1.y=w1*rry*Math.cos(th)+lly)*tz; v1.z=hh;
+          u2.x=.5+(v2.x=w2*rrx*Math.cos(th)+llx)*tz; u2.y=.5+(v2.y=w2*-rry*Math.sin(th)-lly)*tz; v2.z=hh;
+          u3.x=.5+(v3.x=w3*-rrx*Math.sin(th)-llx)*tz; u3.y=.5+(v3.y=w3*-rry*Math.cos(th)-lly)*tz; v3.z=hh;
+          u4.x=.5+(v4.x=w4*-rrx*Math.cos(th)-llx)*tz; u4.y=.5+(v4.y=w4*rry*Math.sin(th)+lly)*tz; v4.z=hh;
+        }
+      }
+    }
+    this.geometry.verticesNeedUpdate=true;
+    this.geometry.computeFaceNormals();
+    this.geometry.computeVertexNormals();
+  };
+  this.Build();
+  this.MeshSetup();
+}
+function Effect(app,ly){
+  this.app=app;
+  this.layer=ly;
+  this.xysepa=false;
+  this.zoomx1=this.zoomx2=100;
+  this.zoomxanim=-1;
+  this.zoomy1=this.zoomy2=100;
+  this.zoomyanim=-1;
+  this.offsetx1=this.offsetx2=0;
+  this.offsetxanim=-1;
+  this.offsety1=this.offsety2=0;
+  this.offsetyanim=-1;
+  this.angle1=this.angle2=0;
+  this.angleanim=-1;
+  this.centerx=this.centery=0;
+  this.alpha1=this.alpha2=100;
+  this.alphaanim=-1;
+  this.brightness1=this.brightness2=0;
+  this.brightnessanim=-1;
+  this.hue1=this.hue2=0;
+  this.hueanim=-1;
+  this.Apply=function(ratio){
+    if(!this.layer.prim.mesh)
+      return;
+    var pr=this.layer.prim;
+    var zoomx,zoomy,offsetx,offsety,angle,alpha,brightness,hue;
+    if(this.zoomxanim>=0)
+      zoomx=this.zoomx1+(this.zoomx2-this.zoomx1)*ratio;
+    else
+      zoomx=this.zoomx1;
+    if(this.zoomyanim>=0)
+      zoomy=this.zoomy1+(this.zoomy2-this.zoomy1)*ratio;
+    else
+      zoomy=this.zoomy1;
+    if(this.offsetxanim>=0)
+      offsetx=this.offsetx1+(this.offsetx2-this.offsetx1)*ratio;
+    else
+      offsetx=this.offsetx1;
+    if(this.offsetyanim>=0)
+      offsety=this.offsety1+(this.offsety2-this.offsety1)*ratio;
+    else
+      offsety=this.offsety1;
+    if(this.angleanim>=0)
+      angle=this.angle1+(this.angle2-this.angle1)*ratio;
+    else
+      angle=this.angle1;
+    if(this.alphaanim>=0)
+      alpha=this.alpha1+(this.alpha2-this.alpha1)*ratio;
+    else
+      alpha=this.alpha1;
+    if(this.brightnessanim>=0)
+      brightness=this.brightness1+(this.brightness2-this.brightness1)*ratio;
+    else
+      brightness=this.brightness1;
+    if(this.hueanim>=0)
+      hue=this.hue1+(this.hue2-this.hue1)*ratio;
+    else
+      hue=this.hue1;
+    if(this.xysepa){
+      pr.mesh.scale.x=zoomx;
+      pr.mesh.scale.y=zoomy;
+    }
+    else {
+      pr.mesh.scale.x=pr.mesh.scale.y=zoomx;
+    }
+    pr.mesh.position.x=offsetx-this.centerx;
+    pr.mesh.position.y=offsety-this.centery;
+    pr.rot.rotation.z=-angle*Math.PI/180;
+    pr.rot.position.x=this.centerx;
+    pr.rot.position.y=this.centery;
+    pr.material.opacity=alpha/100;
+    var c=(new Col(this.layer.prim.color)).ChangeColor(brightness,hue);
+    pr.material.color=new THREE.Color(c.GetColor24());
+  }
+}
+function Layer(app,n){
+  this.app=app;
+  this.num=n;
+  this.name="Obj"+(n+1);
+  this.visible=true;
+  this.prim=new Primitive(this.app,this);
+  this.eff=new Effect(this.app,this);
+  this.Build=function(){
+    this.prim.Build();
+    this.prim.MeshSetup();
+  };
+  this.Setup=function(n,v){
+    switch(n){
+    case "visible":
+      this.visible=v;
+      this.prim.mesh.visible=this.visible;
+//      this.prim.MeshSetup();
+      break;
+    case "color":
+      this.prim.color=((v.r|0)<<16)+((v.g|0)<<8)+((v.b|0));
+      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      break;
+    case "type":
+      this.prim.type=v;
+      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.app.UpdateLayerPane();
+      break;
+    case "aspect":
+      this.prim.aspect=parseFloat(v);
+//      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.prim.geometry.uvsNeedUpdate=true;
+      break;
+    case "round":
+      this.prim.round=parseFloat(v);
+//      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.prim.geometry.uvsNeedUpdate=true;
+      break;
+    case "wave":
+      this.prim.wave=parseFloat(v);
+      this.prim.MeshSetup();
+      this.prim.geometry.uvsNeedUpdate=true;
+      break;
+    case "waveangle":
+      this.prim.waveangle=parseFloat(v);
+      this.prim.MeshSetup();
+      this.prim.geometry.uvsNeedUpdate=true;
+      break;
+    case "emboss":
+      this.prim.emboss=parseFloat(v);
+//      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.prim.geometry.uvsNeedUpdate=true;
+      break;
+    case "embossdiffuse":
+      this.prim.embossdiffuse=parseFloat(v);
+//      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.prim.geometry.uvsNeedUpdate=true;
+      break;
+    case "height":
+      this.prim.height=parseFloat(v);
+//      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.prim.geometry.uvsNeedUpdate=true;
+      break;
+    case "shininess":
+      this.prim.shininess=parseFloat(v);
+//      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.prim.MatSetup();
+      break;
+    case "metalic":
+      this.prim.metalic=parseFloat(v);
+      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      break;
+    case "texture":
+      this.prim.texture=v;
+      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      break;
+    case "textype":
+      this.prim.textype=v;
+      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      break;
+    case "texdepth":
+      this.prim.texdepth=parseFloat(v);
+//      this.prim.Rebuild();
+//      this.prim.MeshSetup();
+      this.prim.MatSetup();
+      break;
+    case "texzoom":
+      this.prim.texzoom=parseFloat(v);
+//      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.prim.geometry.uvsNeedUpdate=true;
+      break;
+    case "xysepa":
+      this.eff.xysepa=v;
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "zoomx1":
+      this.eff.zoomx1=parseFloat(v);
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "zoomx2":
+      this.eff.zoomx2=parseFloat(v);
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "zoomxanim":
+      this.eff.zoomxanim=v;
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "zoomy1":
+      this.eff.zoomy1=parseFloat(v);
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "zoomy2":
+      this.eff.zoomy2=parseFloat(v);
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "zoomyanim":
+      this.eff.zoomyanim=v;
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "offsetx1":
+      this.eff.offsetx1=parseFloat(v);
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "offsetx2":
+      this.eff.offsetx2=parseFloat(v);
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "offsetxanim":
+      this.eff.offsetxanim=v;
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "offsety1":
+      this.eff.offsety1=parseFloat(v);
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "offsety2":
+      this.eff.offsety2=parseFloat(v);
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "offsetyanim":
+      this.eff.offsetyanim=v;
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "angle1":
+      this.eff.angle1=parseFloat(v);
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "angle2":
+      this.eff.angle2=parseFloat(v);
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "angleanim":
+      this.eff.angleanim=v;
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "centerx":
+      this.eff.centerx=parseFloat(v);
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "centery":
+      this.eff.centery=parseFloat(v);
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "alpha1":
+      this.eff.alpha1=parseFloat(v);
+      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "alpha2":
+      this.eff.alpha2=parseFloat(v);
+      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "alphaanim":
+      this.eff.alphaanim=v;
+      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "brightness1":
+      this.eff.brightness1=parseFloat(v);
+      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "brightness2":
+      this.eff.brightness2=parseFloat(v);
+      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "brightnessanim":
+      this.eff.brightnessanim=v;
+      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "hue1":
+      this.eff.hue1=parseFloat(v);
+      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "hue2":
+      this.eff.hue2=parseFloat(v);
+      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "hueanim":
+      this.eff.hueanim=v;
+      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.eff.Apply(this.app.curRatio);
+      break;
+    }
+    this.prim.geometry.computeFaceNormals();
+    app.Render();
+  }
+}
+function Lighting(app){
+  this.app=app;
+  this.ambient=30;
+  this.intensity=100;
+  this.light1 = new THREE.DirectionalLight(0xffffff,1);
+//  this.light2 = new THREE.DirectionalLight(0xffffff,0.1);
+//  this.light1 = new THREE.SpotLight(0xffffff,1,0,Math.PI/3,10,10);
+  this.light1.position.set( -200, 200, 200 );
+//  this.light2.position.set( 150, 200, 200 );
+//  this.light1.shadow.mapSize.x=3072;
+//  this.light1.shadow.mapSize.y=2048;
+// this.light1.shadow.bias=0.0001;
+  this.light1.shadow.mapSize.x=2048;
+  this.light1.shadow.mapSize.y=2048;
+  this.light1.shadow.bias=0.0002;
+  this.light1.castShadow=true;
+  app.scene.add(this.light1);
+
+//  this.light2.shadow.mapSize.x=2048;
+//  this.light2.shadow.mapSize.y=2048;
+//  this.light2.shadow.bias=0.0002;
+//  this.light2.castShadow=true;
+//  app.scene.add(this.light2);
+
+
+  this.light0 = new THREE.AmbientLight(0x404040);
+  app.scene.add(this.light0);
+  document.getElementById("ambient").value=this.ambient;
+  document.getElementById("intensity").value=this.intensity;
+  this.Setup=function(n,v){
+    switch(n){
+    case "intensity":
+      this.intensity=v;
+      this.light1.intensity=v/100;
+      this.app.Render();
+      break;
+    case "ambient":
+      this.ambient=v;
+      this.light0.color.r=this.light0.color.g=this.light0.color.b=(v/100);
+      this.app.Render();
+      break;
+    }
+  }
+}
+function KnobData(ap) {
+  function Def(kd,nam,x,def){
+    if(x!=def) kd[nam]=x;
+  }
+  Def(this,"camx",ap.camx,0);
+  Def(this,"camy",ap.camy,null);
+  Def(this,"ambient",ap.lighting.ambient,30);
+  Def(this,"intensity",ap.lighting.intensity,100);
+  Def(this,"camzoom",ap.camzoom,100);
+  this.width=ap.exportwidth;
+  this.height=ap.exportheight;
+  this.frames=ap.exportframes;
+  this.layer=[];
+  var i;
+  for(i=0;ap.layer[i];++i){
+    this.layer[i]={};
+    var t=this.layer[i];
+    var p=ap.layer[i];
+    t.name=p.name;
+    t.type=p.type;
+    var tp=t.prim={};
+    Def(tp,"type",p.prim.type,"none");
+    Def(tp,"aspect",p.prim.aspect,0);
+    Def(tp,"round",p.prim.round,0);
+    Def(tp,"wave",p.prim.wave,0);
+    Def(tp,"waveangle",p.prim.waveangle,4);
+    Def(tp,"deflate",p.prim.emboss,0);
+    Def(tp,"smooth",p.prim.embossdiffuse,0);
+    Def(tp,"height",p.prim.height,null);
+    Def(tp,"shininess",p.prim.shininess,30);
+    Def(tp,"texture",p.prim.texture,null);
+    Def(tp,"textype",p.prim.textype,"bump");
+    Def(tp,"texdepth",p.prim.texdepth,0);
+    Def(tp,"texzoom",p.prim.texzoom,100);
+    Def(tp,"color",p.prim.color,null);
+    var te=t.eff={};
+    Def(te,"xysepa",p.eff.xysepa,false);
+    Def(te,"zoomx1",p.eff.zoomx1,100);
+    Def(te,"zoomx2",p.eff.zoomx2,100);
+    Def(te,"zoomxa",p.eff.zoomxanim,-1);
+    Def(te,"zoomy1",p.eff.zoomy1,100);
+    Def(te,"zoomy2",p.eff.zoomy2,100);
+    Def(te,"zoomya",p.eff.zoomyanim,-1);
+    Def(te,"offsetx1",p.eff.offsetx1,0);
+    Def(te,"offsetx2",p.eff.offsetx2,0);
+    Def(te,"offsetxa",p.eff.offsetxanim,-1);
+    Def(te,"offsety1",p.eff.offsety1,0);
+    Def(te,"offsety2",p.eff.offsety2,0);
+    Def(te,"offsetya",p.eff.offsetyanim,-1);
+    Def(te,"keepdir",p.eff.keepdir,false);
+    Def(te,"centerx",p.eff.centerx,0);
+    Def(te,"centery",p.eff.centery,0);
+    Def(te,"angle1",p.eff.angle1,0);
+    Def(te,"angle2",p.eff.angle2,0);
+    Def(te,"anglea",p.eff.angleanim,-1);
+    Def(te,"alpha1",p.eff.alpha1,100);
+    Def(te,"alpha2",p.eff.alpha2,100);
+    Def(te,"alphaa",p.eff.alphaanim,-1);
+    Def(te,"bright1",p.eff.brightness1,0);
+    Def(te,"bright2",p.eff.brightness2,0);
+    Def(te,"brighta",p.eff.brightnessanim,-1);
+    Def(te,"hue1",p.eff.hue1,0);
+    Def(te,"hue2",p.eff.hue2,0);
+    Def(te,"huea",p.eff.hueanim,-1);
+  }
+}
+function App() {
+  this.colorPicker=new ColorPicker();
+  this.colorPicker.callback=function(c){
+    app.Setup("color",c);
+  };
+  this.maxlayer=16;
+  this.lypane=document.getElementById("lypane");
+  this.primpane=document.getElementById("primpane");
+  this.effpane=document.getElementById("effpane");
+  this.primpane.appendChild(this.colorPicker.element);
+  this.animate=false;
+  this.animatedir=1;
+  this.animateid=0;
+  this.scene=new THREE.Scene();
+  this.width=256;
+  this.height=256;
+  this.exportwidth=64;
+  this.exportheight=64;
+  this.exportframes=17;
+  document.getElementById("exportwidth").value=this.exportwidth;
+  document.getElementById("exportheight").value=this.exportheight;
+  document.getElementById("exportframes").value=this.exportframes;
+  this.exportcanvas=document.createElement("canvas");
+  this.curLayer=0;
+  this.curRatio=0;
+  this.camx=this.camxx=0;
+  this.camyy=(this.camy=-30)/180*Math.PI;
+  this.camzoom=100;
+  this.cameraparam={fov:60, aspect:this.width/this.height, near:1, far:1000};
+//  this.camera=new THREE.PerspectiveCamera(this.cameraparam.fov, this.cameraparam.aspect, this.cameraparam.near, this.cameraparam.far);
+  this.camera=new THREE.OrthographicCamera(-100,100,100,-100,0,200);
+  this.camera.position.set( 0, 0, 200 );
+  this.renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+  this.renderer.setClearColor(0x000000,0);
+//  this.renderer = new THREE.CanvasRenderer({ antialias:true });
+  this.renderer.shadowMap.enabled = true;
+  this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+//  console.log(this.renderer);
+  this.renderer.setSize(this.width, this.height);
+  document.getElementById("prevpane").appendChild(this.renderer.domElement );
+//  console.log(document.getElementById("prevpane").childNodes[1]);
+  document.getElementById("prevpane").childNodes[1].style.border="1px solid #888";
+  this.texloader=new THREE.TextureLoader();
+  this.texture=[];
+  this.texlist=[
+    {name:"Aura",file:"Aura.jpg"},
+    {name:"Checkers",file:"Checkers.bmp"},
+    {name:"Circle",file:"Circle.jpg"},
+    {name:"Coal", file:"Coal.jpg"},
+    {name:"Fabric",file:"Fabric.bmp"},
+    {name:"Hairline",file:"Hairline.bmp"},
+    {name:"HairlineV",file:"HairlineV.bmp"},
+    {name:"Hexagon",file:"Hexagon.png"},
+    {name:"Magma",file:"Magma.bmp"},
+    {name:"Mosaic",file:"Mosaic.bmp"},
+    {name:"Plant",file:"Plant.png"},
+    {name:"Plasma",file:"Plasma.bmp"},
+    {name:"PunchingMetal",file:"PunchingMetal.png"},
+    {name:"Radiation",file:"Radiation.jpg"},
+    {name:"Sand",file:"Sand.png"},
+    {name:"Scratch",file:"Scratch.jpg"},
+    {name:"chikuwa",file:"chikuwa.jpg"}];
+  this.texloadcnt=this.texlist.length;
+  for(var i=0;this.texlist[i];++i){
+    this.texture[this.texlist[i].name]={};
+    this.texture[this.texlist[i].name].tex=this.texloader.load("texture/"+this.texlist[i].file,function(){if(--app.texloadcnt==0)app.TexLoadComplete();});
+    this.texture[this.texlist[i].name].tex.wrapS=THREE.RepeatWrapping;
+    this.texture[this.texlist[i].name].tex.wrapT=THREE.RepeatWrapping;
+  }
+  this.lighting=new Lighting(this);
+  this.layer=[];
+  this.layer[0]=new Layer(this,0);
+  this.layer[1]=new Layer(this,1);
+  this.layer[2]=new Layer(this,2);
+  this.Render=function(){
+    this.renderer.render(this.scene, this.camera);
+  };
+  this.SetupCam=function(){
+    this.camxx=this.camx/180*Math.PI;
+    this.camyy=this.camy/180*Math.PI;
+    this.camera.position.set(100*Math.sin(this.camxx)*Math.cos(this.camyy),100*Math.sin(this.camyy),100*Math.cos(this.camxx)*Math.cos(this.camyy));
+    this.camera.lookAt({x:0,y:0,z:0});
+    this.camera.zoom=this.camzoom/100;
+    this.camera.updateProjectionMatrix();
+  };
+  this.LoadExec=function(kd){
+    function Set(o,n,v,e,t){
+      if(typeof(v)!="undefined"){
+        o[n]=v;
+        switch(t){
+        case "v":
+          document.getElementById(e).value=v;
+        }
+      }
+    }
+    if(!kd)
+      return;
+    var k=JSON.parse(kd);
+    Set(app,"camx",k.camx,"camx","v");
+    Set(app,"camy",k.camy,"camy","v");
+    Set(app,"ambient",k.ambient,"ambient","v");
+    Set(app,"intensity",k.intensity,"intensity","v");
+    Set(app,"camzoom",k.camzoom,"camzoom","v");
+    Set(app,"exportwidth",k.width,"exportwidth","v");
+    Set(app,"exportheight",k.height,"exportheight","v");
+    Set(app,"exportframes",k.frames,"exportframes","v");
+    var i;
+    for(i=0;i<k.layer.length;++i){
+      var l=k.layer[i];
+      var p=app.layer[i]=new Layer(app,i);
+      Set(p.prim,"type",l.prim.type);
+      Set(p.prim,"aspect",l.prim.aspect);
+      Set(p.prim,"round",l.prim.round);
+      Set(p.prim,"wave",l.prim.wave);
+      Set(p.prim,"waveangle",l.prim.waveangle);
+      Set(p.prim,"emboss",l.prim.deflate);
+      Set(p.prim,"embossdiffuse",l.prim.smooth);
+      Set(p.prim,"height",l.prim.height);
+      Set(p.prim,"shininess",l.prim.shininess);
+      Set(p.prim,"texture",l.prim.texture);
+      Set(p.prim,"textype",l.prim.textype);
+      Set(p.prim,"texdepth",l.prim.texdepth);
+      Set(p.prim,"texzoom",l.prim.texzoom);
+      Set(p.prim,"color",l.prim.color);
+      Set(p.eff,"xysepa",l.eff.xysepa);
+      Set(p.eff,"zoomx1",l.eff.zoomx1);
+      Set(p.eff,"zoomx2",l.eff.zoomx2);
+      Set(p.eff,"zoomxanim",l.eff.zoomxa);
+      Set(p.eff,"zoomy1",l.eff.zoomy1);
+      Set(p.eff,"zoomy2",l.eff.zoomy2);
+      Set(p.eff,"zoomyanim",l.eff.zoomya);
+      Set(p.eff,"offsetx1",l.eff.offsetx1);
+      Set(p.eff,"offsetx2",l.eff.offsetx2);
+      Set(p.eff,"offsetxanim",l.eff.offsetxa);
+      Set(p.eff,"offsety1",l.eff.offsety1);
+      Set(p.eff,"offsety2",l.eff.offsety2);
+      Set(p.eff,"offsetyanim",l.eff.offsetya);
+      Set(p.eff,"keepdir",l.eff.keepdir);
+      Set(p.eff,"centerx",l.eff.centerx);
+      Set(p.eff,"centery",l.eff.centery);
+      Set(p.eff,"angle1",l.eff.angle1);
+      Set(p.eff,"angle2",l.eff.angle2);
+      Set(p.eff,"angleanim",l.eff.anglea);
+      Set(p.eff,"alpha1",l.eff.alpha1);
+      Set(p.eff,"alpha2",l.eff.alpha2);
+      Set(p.eff,"alphaanim",l.eff.alphaa);
+      Set(p.eff,"brightness1",l.eff.bright1);
+      Set(p.eff,"brightness2",l.eff.bright2);
+      Set(p.eff,"brightnessanim",l.eff.brigha);
+      Set(p.eff,"hue1",l.eff.hue1);
+      Set(p.eff,"hue2",l.eff.hue2);
+      Set(p.eff,"hueanim",l.eff.huea);
+      p.prim.Rebuild();
+      p.prim.MeshSetup();
+      p.eff.Apply(0);
+    }
+    for(;i<app.maxlayer;++i)
+      app.layer[i]=null;
+    app.SetupCam();
+    app.SelLayer(0);
+    app.UpdateLayerPane();
+    app.curRatio=0;
+    app.Render();
+//    console.log(app);
+  };
+  this.TexLoadComplete=function(){
+    this.LoadExec(initload);
+  };
+  this.Save=function(){
+    var d=new KnobData(this);
+    var ref=location.href;
+    if(ref.indexOf("?")>=0)
+      ref=ref.substr(0,ref.indexOf("?"));
+    var s=JSON.stringify(d);
+    s=ref+"?d="+btoa(s);
+    document.getElementById("savepane").style.display="block";
+    document.getElementById("saveurl").value=s;
+  }
+  this.Download=function(){
+    var cvwork=document.getElementById("exportcanvas");
+    var s=cvwork.toDataURL();
+//    console.log(s);
+    var a=document.createElement('a');
+    a.download="knob.png";
+    a.href="data:application/octet-stream;base64,"+s.split(",")[1];
+    a.click();
+  };
+  this.Export=function(){
+    var cvwork=document.getElementById("exportcanvas");
+    cvwork.width=this.exportwidth;
+    cvwork.height=this.exportheight*this.exportframes;
+    var s=document.getElementById("exportpane");
+    s.style.display="block";
+    var ctx=cvwork.getContext("2d");
+    this.img=[];
+    for(var i=0;i<this.exportframes;++i)
+      this.img[i]=new Image();
+    for(var i=0;i<this.exportframes;++i){
+      var r;
+      if(this.exportframes<2)
+        r=0;
+      else
+        r=i/this.exportframes;
+      for(var j=0;this.layer[j];++j){
+        this.layer[j].eff.Apply(r);
+      }
+      this.Render();
+      this.img[i].src=this.renderer.domElement.toDataURL();
+      this.img[i].i=i;
+      this.img[i].onload=function(){
+        ctx.drawImage(this,0,this.i*app.exportheight,app.exportwidth,app.exportheight);
+      }
+    }
+  }
+  this.Setup=function(n,v){
+    switch(n){
+    case "exportwidth":
+      this.exportwidth=parseFloat(v);
+      break;
+    case "exportheight":
+      this.exportheight=parseFloat(v);
+      break;
+    case "exportframes":
+      this.exportframes=parseFloat(v);
+      break;
+    case "ambient":
+    case "intensity":
+      this.lighting.Setup(n,v);
+      break;
+    case "camx":
+      this.camx=v;
+      document.getElementById("camxsli").value=v;
+      document.getElementById("camx").value=v;
+      this.SetupCam();
+      this.Render();
+      break;
+    case "camy":
+      this.camy=v;
+      document.getElementById("camysli").value=v;
+      document.getElementById("camy").value=v;
+      this.SetupCam();
+      this.Render();
+      break;
+    case "camzoom":
+      this.camzoom=parseFloat(v);
+      this.SetupCam();
+      this.Render();
+      break;
+    case "ratio":
+      this.curRatio=parseFloat(v);
+      for(var i=0;this.layer[i];++i){
+        this.layer[i].eff.Apply(this.curRatio);
+      }
+      this.Render();
+      break;
+    default:
+      this.layer[this.curLayer].Setup(n,v);
+      break;
+    }
+  };
+  this.UpdateLayerPane=function(){
+    for(var i=0;i<this.maxlayer;++i){
+      var el=document.getElementById("layer"+(i+1));
+      var ic=document.getElementById("icon"+(i+1));
+      var lv=document.getElementById("lv"+(i+1));
+      if(this.layer[i]){
+        document.getElementById("lyname"+(i+1)).innerHTML=this.layer[i].name;
+        el.style.display="block";
+        lv.checked=this.layer[i].visible;
+        switch(this.layer[i].prim.type){
+        case "none":
+          ic.src="images/none.svg";
+          break;
+        case "cylinder":
+          ic.src="images/circlefill.svg";
+          break;
+        case "cube":
+          ic.src="images/rectfill.svg";
+          break;
+        }
+      }
+      else {
+        el.style.display="none";
+      }
+    }
+  }
+  this.SelLayer=function(n){
+    this.curLayer=n;
+    for(var i=0;i<layermax;++i){
+      var ly=document.getElementById("layer"+i);
+      if(i==n+1){
+        ly.style.background="#aaa";
+        ly.style.color="#fff";
+      }
+      else{
+        ly.style.background="#444";
+        ly.style.color="#ccc";
+      }
+    }
+  //  document.getElementById("type").value=this.layer[this.curLayer].type;
+    var p=this.layer[this.curLayer].prim;
+    var e=this.layer[this.curLayer].eff;
+    document.getElementById("type").value=p.type;
+    document.getElementById("aspect").value=p.aspect;
+    document.getElementById("round").value=p.round;
+    document.getElementById("wave").value=p.wave;
+    document.getElementById("waveangle").value=p.waveangle;
+    document.getElementById("emboss").value=p.emboss;
+    document.getElementById("embossdiffuse").value=p.embossdiffuse;
+    document.getElementById("height").value=p.height;
+    document.getElementById("shininess").value=p.shininess;
+    document.getElementById("texture").value=p.texture;
+    document.getElementById("texdepth").value=p.texdepth;
+    document.getElementById("texzoom").value=p.texzoom;
+    this.colorPicker.SetCurColor(p.color);
+    document.getElementById("xysepa").checked=e.xysepa;
+    document.getElementById("zoomx1").value=e.zoomx1;
+    document.getElementById("zoomx2").value=e.zoomx2;
+    document.getElementById("zoomxanim").value=e.zoomxanim;
+    document.getElementById("zoomy1").value=e.zoomy1;
+    document.getElementById("zoomy2").value=e.zoomy2;
+    document.getElementById("zoomyanim").value=e.zoomyanim;
+    document.getElementById("offsetx1").value=e.offsetx1;
+    document.getElementById("offsetx2").value=e.offsetx2;
+    document.getElementById("offsetxanim").value=e.offsetxanim;
+    document.getElementById("offsety1").value=e.offsety1;
+    document.getElementById("offsety2").value=e.offsety2;
+    document.getElementById("offsetyanim").value=e.offsetyanim;
+    document.getElementById("keepdir").value=e.keepdir;
+    document.getElementById("centerx").value=e.centerx;
+    document.getElementById("centery").value=e.centery;
+    document.getElementById("angle1").value=e.angle1;
+    document.getElementById("angle2").value=e.angle2;
+    document.getElementById("angleanim").value=e.angleanim;
+    document.getElementById("alpha1").value=e.alpha1;
+    document.getElementById("alpha2").value=e.alpha2;
+    document.getElementById("alphaanim").value=e.alphaanim;
+    document.getElementById("brightness1").value=e.brightness1;
+    document.getElementById("brightness2").value=e.brightness2;
+    document.getElementById("brightnessanim").value=e.brightnessanim;
+    document.getElementById("hue1").value=e.hue1;
+    document.getElementById("hue2").value=e.hue2;
+    document.getElementById("hueanim").value=e.hueanim;
+  };
+  this.paramdrag=null;
+  this.paramdragval=0;
+  this.paramdragpos=0;
+  this.paramdragmin=0;
+  this.paramdragmax=100;
+  this.Confirm=function(s,ok,cancel){
+    var dlgpane=document.getElementById("dlgpane");
+    var dlg=document.getElementById("dlgmess");
+    dlg.innerHTML=s;
+    document.getElementById("dlgok").onclick=ok;
+    document.getElementById("dlgcancel").onclick=cancel;
+    dlgpane.style.display="block";
+  }
+  this.DlgClose=function(){
+    document.getElementById("dlgpane").style.display="none";
+  }
+  this.EditValue=function(e,n,min,max){
+    this.paramdrag=document.getElementById(n);
+    this.paramdragval=parseFloat(this.paramdrag.value);
+    this.paramdragpos=e.clientY;
+    this.paramdragmin=min;
+    this.paramdragmax=max;
+  }
+  window.addEventListener("mousemove",function(e){
+    if(this.paramdrag){
+      var v=this.paramdragval+this.paramdragpos-e.clientY;
+      if(v<this.paramdragmin) v=this.paramdragmin;
+      if(v>this.paramdragmax) v=this.paramdragmax;
+      this.paramdrag.value=v;
+      app.Setup(this.paramdrag.id,this.paramdrag.value);
+    }
+  }.bind(this));
+  window.addEventListener("mouseup",function(e){
+    this.paramdrag=null;
+  }.bind(this));
+  this.UpdateLayerPane();
+  this.Render();
+  this.SelLayer(0);
+  this.SetupCam();
+  this.Layout=function(){
+    document.getElementById("lybase").style.height=(window.innerHeight-115)+"px";
+    document.getElementById("lypane").style.height=(window.innerHeight-145)+"px";
+    document.getElementById("primbase").style.height=(window.innerHeight-427)+"px";
+    document.getElementById("primpane").style.height=(window.innerHeight-457)+"px";
+    document.getElementById("effbase").style.height=(window.innerHeight-427)+"px";
+    document.getElementById("effpane").style.height=(window.innerHeight-457)+"px";
+    document.getElementById("prevbase").style.top=(window.innerHeight-400)+"px";
+    document.getElementById("exportframe").style.width=(this.exportwidth+200)+"px";
+    document.getElementById("exportframe2").style.width=(this.exportwidth+50)+"px";
+    document.getElementById("exportframe3").style.left=(this.exportwidth+70)+"px";
+//    document.getElementById("dlgpane").style.height=(window.innerHeight-95)+"px";
+//    document.getElementById("exportpane").style.height=(window.innerHeight-95)+"px";
+  };
+  this.Layout();
+  window.addEventListener("resize",this.Layout);
+  this.SetVisible=function(n,f){
+    this.layer[n].Setup("visible",f);
+  }
+  this.CloseExport=function(){
+    document.getElementById("exportpane").style.display="none";
+  }
+  this.CloseSave=function(){
+    document.getElementById("savepane").style.display="none";
+  }
+  this.Animate=function(){
+      app.curRatio+=app.animatedir*0.01;
+      if(app.curRatio>1 || app.curRatio<0){
+        app.animatedir=-app.animatedir;
+        app.curRatio+=app.animatedir*0.01;
+      }
+      for(var i=0;app.layer[i];++i){
+        app.layer[i].eff.Apply(app.curRatio);
+      }
+      app.Render();
+      if(app.animate)
+        requestAnimationFrame(app.Animate);
+  };
+  this.AnimStart=function(){
+    this.animate=!this.animate;
+    document.getElementById("animate").style.background=this.animate?"#f88":"#ccc";
+    if(this.animate){
+      this.animateid=requestAnimationFrame(this.Animate);
+    }
+    else{
+      cancelAnimationFrame(app.animateid);
+    }
+  };
+  this.LayerRenum=function(){
+    for(var i=0;this.layer[i];++i){
+      this.layer[i].num=i;
+    }
+  };
+  this.FindUnusedLayerNum=function(){
+    var i=0;
+    do{
+      ++i;
+      for(var j=0;this.layer[j];++j){
+        var s="Obj"+i;
+        if(this.layer[j].name===s)
+          break;
+      }
+    } while(this.layer[j]);
+    return "Obj"+i;
+  }
+  this.ForeLayer=function(){
+    if(app.layer[app.curLayer+1]){
+      var t=app.layer[app.curLayer+1];
+      app.layer[app.curLayer+1]=app.layer[app.curLayer];
+      app.layer[app.curLayer]=t;
+      app.LayerRenum();
+      app.SelLayer(app.curLayer+=1);
+      app.UpdateLayerPane();
+    }
+  };
+  this.BackLayer=function(){
+    if(app.curLayer>0){
+      var t=app.layer[app.curLayer-1];
+      app.layer[app.curLayer-1]=app.layer[app.curLayer];
+      app.layer[app.curLayer]=t;
+      app.LayerRenum();
+      app.SelLayer(app.curLayer-=1);
+      app.UpdateLayerPane();
+    }
+  };
+  this.DelLayer=function(){
+    app.Confirm("Delete Object, Sure?",
+      function(){
+        if(app.curLayer==0 && app.layer[1]==null){
+          app.DlgClose();
+          return;
+        }
+        if(app.layer[app.curLayer])
+          app.layer[app.curLayer].Setup("type","none");
+        for(var i=app.curLayer;i<app.maxlayer-1;++i){
+          app.layer[i]=app.layer[i+1];
+        }
+        app.layer[app.maxlayer-1]=null;
+        if(app.layer[app.curLayer]==null)
+          --app.curLayer;
+        app.SelLayer(app.curLayer);
+        app.LayerRenum();
+        app.UpdateLayerPane();
+        app.SelLayer(app.curLayer);
+        app.layer[app.curLayer].prim.Rebuild();
+        app.layer[app.curLayer].prim.MeshSetup();
+        app.layer[app.curLayer].eff.Apply(app.curRatio);
+        app.DlgClose();
+      },
+      function(){
+        app.DlgClose();
+      }
+    );
+  };
+  this.AddLayer=function(){
+    if(app.layer[app.maxlayer-1]==null){
+      var t=new Layer(app,app.curLayer);
+      t.name=app.FindUnusedLayerNum();
+      for(var i=app.curLayer;t;++i){
+        var t2=app.layer[i];
+        app.layer[i]=t;
+        t=t2;
+      }
+      app.LayerRenum();
+      app.UpdateLayerPane();
+      app.SelLayer(app.curLayer);
+    }
+  };
+  this.DupLayer=function(){
+    app.AddLayer();
+    var l1=app.layer[app.curLayer+1];
+    var l2=app.layer[app.curLayer];
+    l2.name=app.FindUnusedLayerNum();
+    l2.prim.type=l1.prim.type;
+    l2.prim.aspect=l1.prim.aspect;
+    l2.prim.round=l1.prim.round;
+    l2.prim.wave=l1.prim.wave;
+    l2.prim.waveangle.l1.prim.waveangle;
+    l2.prim.emboss=l1.prim.emboss;
+    l2.prim.embossdiffuse=l1.prim.embossdiffuse;
+    l2.prim.height=l1.prim.height;
+    l2.prim.shininess=l1.prim.shininess;
+    l2.prim.texture=l1.prim.texture;
+    l2.prim.textype=l1.prim.textype;
+    l2.prim.texdepth=l1.prim.texdepth;
+    l2.prim.texzoom=l1.prim.texzoom;
+    l2.prim.color=l1.prim.color;
+    l2.eff.xysepa=l1.eff.xysepa;
+    l2.eff.zoomx1=l1.eff.zoomx1;
+    l2.eff.zoomx2=l1.eff.zoomx2;
+    l2.eff.zoomxanim=l1.eff.zoomxanim;
+    l2.eff.zoomy1=l1.eff.zoomy1;
+    l2.eff.zoomy2=l1.eff.zoomy2;
+    l2.eff.zoomyanim=l1.eff.zoomyanim;
+    l2.eff.offsetx1=l1.eff.offsetx1;
+    l2.eff.offsetx2=l1.eff.offsetx2;
+    l2.eff.offsetxanim=l1.eff.offsetxanim;
+    l2.eff.offsety1=l1.eff.offsety1;
+    l2.eff.offsety2=l1.eff.offsety2;
+    l2.eff.offsetyanim=l2.eff.offsetyanim;
+    l2.eff.keepdir=l1.eff.keepdir;
+    l2.eff.centerx=l1.eff.centery;
+    l2.eff.centery=l1.eff.centery;
+    l2.eff.angle1=l1.eff.angle1;
+    l2.eff.angle2=l1.eff.angle2;
+    l2.eff.angleanim=l1.eff.angleanim;
+    l2.eff.alpha1=l1.eff.alpha1;
+    l2.eff.alpha2=l1.eff.alpha2;
+    l2.eff.alphaanim=l1.eff.alphaanim;
+    l2.eff.brightness1=l1.eff.brightness1;
+    l2.eff.brightness2=l1.eff.brightness2;
+    l2.eff.brightnessanim=l1.eff.brightnessanim;
+    l2.eff.hue1=l1.eff.hue1;
+    l2.eff.hue2=l1.eff.hue2;
+    l2.eff.hueanim=l1.eff.hueanim;
+
+    app.LayerRenum();
+    app.UpdateLayerPane();
+    l2.prim.Rebuild();
+    l2.prim.MeshSetup();
+    l2.eff.Apply(app.curRatio);
+    app.SelLayer(app.curLayer);
+  };
+  this.New=function(){
+    app.Confirm("Not Saved. OK?",
+      function(){
+        for(var i=0;i<app.maxlayer;++i){
+          if(app.layer[i])
+            app.layer[i].Setup("type","none");
+          app.layer[i]=null;
+        }
+        for(var i=0;i<3;++i)
+          app.layer[i]=new Layer(app,i);
+        app.SelLayer(0);
+        app.UpdateLayerPane();
+        app.Render();
+        app.DlgClose();
+      },
+      function(){
+        app.DlgClose();
+      });
+  };
+
+}
+function Init(){
+  window.app=new App();
+  var s=location.search.substr(1).split("&");
+  for(var i=0;i<s.length;++i){
+    if(s[i].indexOf("d=")==0){
+      initload=atob(s[i].substr(2));
+      return;
+    }
+  }
+}
+/*
+function ParamSet(e){
+  switch(e.id){
+    case "cam_x":
+      app.camx=e.value/200*Math.PI;
+      app.camera.position.set(3*Math.sin(app.camx)*Math.cos(app.camy),3*Math.sin(app.camy),3*Math.cos(app.camx)*Math.cos(app.camy));
+      app.camera.lookAt({x:0,y:0,z:0});
+      break;
+    case "cam_y":
+      app.camy=e.value/200*Math.PI;
+      app.camera.position.set(3*Math.sin(app.camx)*Math.cos(app.camy),3*Math.sin(app.camy),3*Math.cos(app.camx)*Math.cos(app.camy));
+      app.camera.lookAt({x:0,y:0,z:0});
+      break;
+    case "pr_height":
+      app.layer[0].Set("height",e.value);
+      break;
+    case "pr_emboss":
+      app.layer[0].Set("emboss",e.value);
+      break;
+    case "pr_rectx":
+      app.layer[0].Set("rectx",e.value);
+      break;
+    case "pr_recty":
+      app.layer[0].Set("recty",e.value);
+      break;
+  }
+  app.Render();
+}
+*/
+window.addEventListener("DOMContentLoaded", Init, false);
+</script>
+</head>
+<body>
+<div id="content">
+<div id="header">
+  <img id="logo" src="images/g200kg160x80.png" height="60"/>
+  <div style="position:absolute;top:8px;left:180px;font-family:'AudioWide',sans-serif;font-size:30px;">KnobMan3D</div>
+  <div style="position:absolute;top:40px;left:180px;">Knob Image Designer  g200kg</div>
+</div>
+<div id="main">
+<div id="menupane">
+  <span>File :
+    <button onclick="app.New()">New</button>
+<!--    <button onclick="app.Load()">Load</button>-->
+    <button onclick="app.Save()">SaveAsURL</button>
+    <button onclick="app.Export()">Export</button>
+  </span>
+  <span>Object :
+    <button onclick="app.AddLayer()">Add</button>
+    <button onclick="app.DupLayer()">Dup</button>
+    <button onclick="app.DelLayer()">Del</button>
+    <button onclick="app.BackLayer()">Back</button>
+    <button onclick="app.ForeLayer()">Fore</button>
+  </span>
+</div>
+<div id="lybase">
+  <div class="panetitle">-- ObjList --</div>
+  <div id="lypane">
+    <div class="lyrow" id="layer0" style="padding-left:25px" onclick="app.SelLayer(-1)">Preference</div>
+    <div class="lyrow" id="layer1" onclick="app.SelLayer(0)" style="display:block"><input type="checkbox" id="lv1" onchange="app.SetVisible(0,this.checked)" checked/><img id="icon1" src="./images/none.svg" /> <span id="lyname1">Obj1</span></div>
+    <div class="lyrow" id="layer2" onclick="app.SelLayer(1)" style="display:block"><input type="checkbox" id="lv2" onchange="app.SetVisible(1,this.checked)" checked/><img id="icon2" src="./images/none.svg" /> <span id="lyname2">Obj2</span></div>
+    <div class="lyrow" id="layer3" onclick="app.SelLayer(2)" style="display:block"><input type="checkbox" id="lv3" onchange="app.SetVisible(2,this.checked)" checked/><img id="icon3" src="./images/none.svg" /> <span id="lyname3">Obj3</span></div>
+    <div class="lyrow" id="layer4" onclick="app.SelLayer(3)"><input type="checkbox" id="lv4" onchange="app.SetVisible(3,this.checked)" checked/><img id="icon4" src="./images/none.svg" /> <span id="lyname4">Obj4</span></div>
+    <div class="lyrow" id="layer5" onclick="app.SelLayer(4)"><input type="checkbox" id="lv5" onchange="app.SetVisible(4,this.checked)" checked/><img id="icon5" src="./images/none.svg" /> <span id="lyname5">Obj5</span></div>
+    <div class="lyrow" id="layer6" onclick="app.SelLayer(5)"><input type="checkbox" id="lv6" onchange="app.SetVisible(5,this.checked)" checked/><img id="icon6" src="./images/none.png" /> <span id="lyname6">Obj6</span></div>
+    <div class="lyrow" id="layer7" onclick="app.SelLayer(6)"><input type="checkbox" id="lv7" onchange="app.SetVisible(6,this.checked)" checked/><img id="icon7" src="./images/none.png" /> <span id="lyname7">Obj7</span></div>
+    <div class="lyrow" id="layer8" onclick="app.SelLayer(7)"><input type="checkbox" id="lv8" onchange="app.SetVisible(7,this.checked)" checked/><img id="icon8" src="./images/none.png" /> <span id="lyname8">Obj8</span></div>
+    <div class="lyrow" id="layer9" onclick="app.SelLayer(8)"><input type="checkbox" id="lv9" onchange="app.SetVisible(8,this.checked)" checked/><img id="icon9" src="./images/none.png" /> <span id="lyname9">Obj9</span></div>
+    <div class="lyrow" id="layer10" onclick="app.SelLayer(9)"><input type="checkbox" id="lv10" onchange="app.SetVisible(9,this.checked)" checked/><img id="icon10" src="./images/none.png" /> <span id="lyname10">Obj10</span></div>
+    <div class="lyrow" id="layer11" onclick="app.SelLayer(10)"><input type="checkbox" id="lv11" onchange="app.SetVisible(10,this.checked)" checked/><img id="icon11" src="./images/none.png" /> <span id="lyname11">Obj11</span></div>
+    <div class="lyrow" id="layer12" onclick="app.SelLayer(11)"><input type="checkbox" id="lv12" onchange="app.SetVisible(11,this.checked)" checked/><img id="icon12" src="./images/none.png" /> <span id="lyname12">Obj12</span></div>
+    <div class="lyrow" id="layer13" onclick="app.SelLayer(12)"><input type="checkbox" id="lv13" onchange="app.SetVisible(12,this.checked)" checked/><img id="icon13" src="./images/none.png" /> <span id="lyname13">Obj13</span></div>
+    <div class="lyrow" id="layer14" onclick="app.SelLayer(13)"><input type="checkbox" id="lv14" onchange="app.SetVisible(13,this.checked)" checked/><img id="icon14" src="./images/none.png" /> <span id="lyname14">Obj14</span></div>
+    <div class="lyrow" id="layer15" onclick="app.SelLayer(14)"><input type="checkbox" id="lv15" onchange="app.SetVisible(14,this.checked)" checked/><img id="icon15" src="./images/none.png" /> <span id="lyname15">Obj15</span></div>
+    <div class="lyrow" id="layer16" onclick="app.SelLayer(15)"><input type="checkbox" id="lv16" onchange="app.SetVisible(15,this.checked)" checked/><img id="icon16" src="./images/none.png" /> <span id="lyname16">Obj16</span></div>
+  </div>
+</div>
+<div id="primbase">
+<div class="panetitle">-- Object Param --</div>
+<div id="primpane">
+<div class="primrow"><div class="primlabel">Type:</div>
+  <select id="type" onchange="app.Setup('type',this.options[selectedIndex].value)">
+    <option value="none" icon="images/none.png">None</option>
+    <option value="cylinder">Cylinder</option>
+    <option value="cube">Cube</option>
+  </select>
+</div>
+<div class="primrow"><div class="primlabel">Aspect:</div> <input id="aspect" type="text" value="0" size="10" oninput="app.Setup('aspect',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'aspect',-100,100)"></button></div>
+<div class="primrow"><div class="primlabel">Round:</div> <input id="round" type="text" value="10" size="10" oninput="app.Setup('round',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'round',0,100)"></button></div>
+<div class="primrow"><div class="primlabel">WaveDepth:</div> <input id="wave" type="text" value="0" size="10" oninput="app.Setup('wave',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'wave',0,100)"></button></div>
+<div class="primrow"><div class="primlabel">WaveAngle:</div> <input id="waveangle" type="text" value="4" size="10" oninput="app.Setup('waveangle',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'waveangle',1,100)"></button></div>
+<div class="primrow"><div class="primlabel">Deflate:</div> <input id="emboss" type="text" value="0" size="10" oninput="app.Setup('emboss',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'emboss',-100,100)"></button></div>
+<div class="primrow"><div class="primlabel">Smooth:</div> <input id="embossdiffuse" type="text" value="0" size="10" oninput="app.Setup('embossdiffuse',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'embossdiffuse',0,100)"></button></div>
+<div class="primrow"><div class="primlabel">Height:</div> <input id="height" type="text" value="1" size="10" oninput="app.Setup('height',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'height',0,100)"></button></div>
+<div class="primrow"><div class="primlabel">Shininess:</div> <input id="shininess" type="text" value="30" size="10" oninput="app.Setup('shininess',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'shininess',0,400)"></button></div>
+<!--<div class="primrow"><div class="primlabel">Metalic:</div> <input id="metalic" type="text" value="0" size="10" oninput="app.Setup('metalic',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'metalic',0,100)"></button></div>-->
+<div class="primrow"><div class="primlabel">Texture:</div> <select id="texture" onchange="app.Setup('texture',this.options[selectedIndex].value)">
+  <option value="Aura">Aura</option>
+  <option value="Checkers">Checkers</option>
+  <option value="Circle">Circle</option>
+  <option value="Coal">Coal</option>
+  <option value="Fabric">Fabric</option>
+  <option value="Hairline">Hairline</option>
+  <option value="HairlineV">HairlineV</option>
+  <option value="Hexagon">Hexagon</option>
+  <option value="Magma">Magma</option>
+  <option value="Mosaic">Mosaic</option>
+  <option value="Plant">Plant</option>
+  <option value="Plasma">Plasma</option>
+  <option value="PunchingMetal">PunchingMetal</option>
+  <option value="Radiation">Radiation</option>
+  <option value="Sand">Sand</option>
+  <option value="Scratch">Scratch</option>
+  <option value="chikuwa">chikuwa</option>
+</select></div>
+<div class="primrow"><div class="primlabel">TexType:</div> <select id="textype" onchange="app.Setup('textype',this.options[selectedIndex].value)">
+  <option value="normal">Normal</option>
+  <option value="bump" selected>Bump</option>
+</select></div>
+<div class="primrow"><div class="primlabel">TexDepth:</div> <input id="texdepth" type="text" value="1" size="10" oninput="app.Setup('texdepth',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'texdepth',-100,100)"></button></div>
+<div class="primrow"><div class="primlabel">TexZoom:</div> <input id="texzoom" type="text" value="1" size="10" oninput="app.Setup('texzoom',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'texzoom',0,200)"></button></div>
+</div>
+</div>
+<div id="prevbase">
+  <div class="panetitle">-- Rendering --</div>
+<div id="prevpane">
+</div>
+<input id="camysli" type="range" min="-90" max="90" value="-30" oninput="app.Setup('camy',this.value)" style="position:absolute;top:175px;left:220px;display:block;width:120px;transform:rotate(-90deg)"/>
+<input id="camxsli" type="range" min="-90" max="90" value="0" oninput="app.Setup('camx',this.value)" style="position:absolute;top:280px;left:120px;display:block;width:120px"/>
+<input id="camy" type="text" size="3" value="-30" oninput="app.Setup('camy',this.value)" style="text-align:center;position:absolute;width:30px;left:265px;top:255px"/>
+<input id="camx" type="text" size="3" value="0" oninput="app.Setup('camx',this.value)" style="text-align:center;position:absolute;width:30px;left:265px;top:280px"/>
+<button onclick="app.Setup('camx',0);app.Setup('camy',0)" style="position:absolute;left:60px;top:280px">Reset</button>
+<div id="prevpane2">
+  <div class="effrow">-- Lighting --</div>
+  <div class="effrow">
+    <div class="efflabel">Ambient:</div>
+    <input id="ambient" type="text" value="0" size="6" oninput="app.lighting.Setup('ambient',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'ambient',0,100)"></button>
+  </div>
+  <div class="effrow"><div class="efflabel">Intensity:</div>
+    <input id="intensity" type="text" value="0" size="6" oninput="app.lighting.Setup('intensity',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'intensity',0,400)"></button>
+  </div>
+  <div class="effrow">-- Camera --</div>
+  <div class="effrow"><div class="efflabel">CamZoom:</div>
+    <input id="camzoom" type="text" value="100" size="6" oninput="app.Setup('camzoom',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'camzoom',0,200)"></button>
+  </div>
+  <div class="effrow">-- Animate --</div>
+  <div class="effrow"><div class="efflabel">Frame:</div>
+  <input type="range" min="0" max="1" step="0.001" value="0" oninput="app.Setup('ratio',this.value)"/>
+  </div>
+  <button id="animate" onclick="app.AnimStart()">Animate</button>
+
+</div>
+</div>
+<div id="effbase">
+  <div class="panetitle">-- Effects --</div>
+<div id="effpane">
+<div class="effrow">-- Zoom --</div>
+<div class="effrow"><div class="efflabel">XY sepa:</div><input id="xysepa" type="checkbox" onchange="app.Setup('xysepa',this.checked)"/></div>
+<div class="effrow">
+  <div class="efflabel">X:</div>
+  <input id="zoomx1" type="text" value="100" size="6" oninput="app.Setup('zoomx1',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'zoomx1',0,400)"></button>
+  <select id="zoomxanim" onchange="app.Setup('zoomxanim',this.options[selectedIndex].value)">
+    <option value="-1"></option><option value="0">=></option>
+  </select>
+  <input id="zoomx2" type="text" value="100" size="6" oninput="app.Setup('zoomx2',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'zoomx2',0,400)"></button>
+</div>
+<div class="effrow">
+  <div class="efflabel">Y:</div>
+  <input id="zoomy1" type="text" value="100" size="6" oninput="app.Setup('zoomy1',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'zoomy1',0,400)"></button>
+  <select id="zoomyanim" onchange="app.Setup('zoomyanim',this.options[selectedIndex].value)">
+    <option value="-1"></option>
+    <option value="0">=></option>
+  </select>
+  <input id="zoomy2" type="text" value="100" size="6" oninput="app.Setup('zoomy2',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'zoomy2',0,400)"></button>
+</div>
+<div class="effrow">-- Offset --</div>
+<div class="effrow">
+  <div class="efflabel">X:</div>
+  <input id="offsetx1" type="text" value="0" size="6" oninput="app.Setup('offsetx1',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'offsetx1',-200,200)"></button>
+  <select id="offsetxanim" onchange="app.Setup('offsetxanim',this.options[selectedIndex].value)">
+    <option value="-1"></option><option value="0">=></option>
+  </select>
+  <input id="offsetx2" type="text" value="0" size="6" oninput="app.Setup('offsetx2',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'offsetx2',-200,200)"></button>
+</div>
+<div class="effrow">
+  <div class="efflabel">Y:</div>
+  <input id="offsety1" type="text" value="0" size="6" oninput="app.Setup('offsety1',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'offsety1',-200,200)"></button>
+  <select id="offsetyanim" onchange="app.Setup('offsetyanim',this.options[selectedIndex].value)">
+    <option value="-1"></option>
+    <option value="0">=></option>
+  </select>
+  <input id="offsety2" type="text" value="0" size="6" oninput="app.Setup('offsety2',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'offsety2',-200,200)"></button>
+</div>
+<div class="effrow">-- RotateAt --</div>
+<div class="effrow">
+  <div class="efflabel">KeepDir:</div>
+  <input id="keepdir" type="checkbox" onchange="app.Setup('keepdir',this.checked)"/>
+</div>
+<div class="effrow"><div class="efflabel">CenterX:</div>
+  <input id="centerx" type="text" value="0" size="6" oninput="app.Setup('centerx',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'centerx',-200,200)"></button>
+</div>
+<div class="effrow"><div class="efflabel">CenterY:</div>
+  <input id="centery" type="text" value="0" size="6" oninput="app.Setup('centery',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'centery',-200,200)"></button>
+</div>
+<div class="effrow"><div class="efflabel">Angle:</div>
+  <input id="angle1" type="text" value="0" size="6" oninput="app.Setup('angle1',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'angle1',-360,360)"></button>
+  <select id="angleanim" onchange="app.Setup('angleanim',this.options[selectedIndex].value)">
+    <option value="-1"></option>
+    <option value="0">=></option>
+  </select>
+  <input id="angle2" type="text" value="0" size="6" oninput="app.Setup('angle2',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'angle2',-360,360)"></button>
+</div>
+<div class="effrow">-- Colors --</div>
+<div class="effrow"><div class="efflabel">Alpha:</div>
+  <input id="alpha1" type="text" value="100" size="6" oninput="app.Setup('alpha1',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'alpha1',0,100)"></button>
+  <select id="alphaanim" onchange="app.Setup('alphaanim',this.options[selectedIndex].value)">
+    <option value="-1"></option>
+    <option value="0">=></option>
+  </select>
+  <input id="alpha2" type="text" value="100" size="6" oninput="app.Setup('alpha2',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'alpha2',0,100)"></button>
+</div>
+<div class="effrow"><div class="efflabel">Brightness:</div>
+  <input id="brightness1" type="text" value="100" size="6" oninput="app.Setup('brightness1',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'brightness1',-100,100)"></button>
+  <select id="brightnessanim" onchange="app.Setup('brightnessanim',this.options[selectedIndex].value)">
+    <option value="-1"></option>
+    <option value="0">=></option>
+  </select>
+  <input id="brightness2" type="text" value="100" size="6" oninput="app.Setup('brightness2',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'brightness2',-360,360)"></button>
+</div>
+<div class="effrow"><div class="efflabel">Hue:</div>
+  <input id="hue1" type="text" value="100" size="6" oninput="app.Setup('hue1',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'hue1',-360,360)"></button>
+  <select id="hueanim" onchange="app.Setup('hueanim',this.options[selectedIndex].value)">
+    <option value="-1"></option>
+    <option value="0">=></option>
+  </select>
+  <input id="hue2" type="text" value="100" size="6" oninput="app.Setup('hue2',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'hue2',-360,360)"></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="exportpane">
+  <div id="exportframe">
+    <div id="exportframe2">
+      <canvas id="exportcanvas" width="512" height="512"></canvas>
+    </div>
+    <div id="exportframe3">
+      <div class="exprow"><div class="explabel">width:</div><input id="exportwidth" type="text" size="3" onchange="app.Setup('exportwidth',this.value)"/></div>
+      <div class="exprow"><div class="explabel">height:</div><input id="exportheight" type="text" size="3" onchange="app.Setup('exportheight',this.value)"/></div>
+      <div class="exprow"><div class="explabel">frames:</div><input id="exportframes" type="text" size="3" onchange="app.Setup('exportframes',this.value)"/></div>
+      <button onclick="app.Export()">Apply</button>
+      <button onclick="app.Download()">Download</button>
+      <button onclick="app.CloseExport()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="savepane">
+  <div id="saveframe">
+    <textarea id="saveurl" rows="10" cols="40"></textarea><br/>
+    <div><button id="saveclose" onclick="app.CloseSave()">Close</button></div>
+  </div>
+</div>
+
+<div id="dlgpane">
+  <div id="dlgframe">
+    <div id="dlgmess"></div><br/>
+    <div><button id="dlgok">OK</button> <button id="dlgcancel">Cancel</button></div>
+  </div>
+</div>
+
+
+</body>
+</html>
