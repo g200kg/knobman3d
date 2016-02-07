@@ -1630,6 +1630,7 @@ function App() {
     a.click();
   };
   this.Export=function(){
+    this.Layout();
     var cvwork=document.getElementById("exportcanvas");
     cvwork.width=this.exportwidth;
     cvwork.height=this.exportheight*this.exportframes;
