@@ -1644,7 +1644,7 @@ function App() {
       if(this.exportframes<2)
         r=0;
       else
-        r=i/this.exportframes;
+        r=i/(this.exportframes-1);
       for(var j=0;this.layer[j];++j){
         this.layer[j].eff.Apply(r);
       }
