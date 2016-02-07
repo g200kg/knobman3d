@@ -46,7 +46,7 @@ body{
   height:95%;
   background:#444;
   margin:auto;
-  border:2px solid #222;
+  border:1px solid #888;
   border-radius: 8px;
 }
 #exportframe2{
@@ -1385,6 +1385,7 @@ function KnobData(ap) {
   Def(this,"ambient",ap.lighting.ambient,30);
   Def(this,"intensity",ap.lighting.intensity,100);
   Def(this,"camzoom",ap.camzoom,100);
+  this.exporttype=ap.exporttype;
   this.width=ap.exportwidth;
   this.height=ap.exportheight;
   this.frames=ap.exportframes;
@@ -1458,9 +1459,11 @@ function App() {
   this.scene=new THREE.Scene();
   this.width=256;
   this.height=256;
+  this.exporttype="vert";
   this.exportwidth=64;
   this.exportheight=64;
   this.exportframes=17;
+  document.getElementById("exporttype").value=this.exporttype;
   document.getElementById("exportwidth").value=this.exportwidth;
   document.getElementById("exportheight").value=this.exportheight;
   document.getElementById("exportframes").value=this.exportframes;
@@ -1545,6 +1548,7 @@ function App() {
     Set(app,"ambient",k.ambient,"ambient","v");
     Set(app,"intensity",k.intensity,"intensity","v");
     Set(app,"camzoom",k.camzoom,"camzoom","v");
+    Set(app,"exporttype",k.type,"exporttype","v");
     Set(app,"exportwidth",k.width,"exportwidth","v");
     Set(app,"exportheight",k.height,"exportheight","v");
     Set(app,"exportframes",k.frames,"exportframes","v");
@@ -1632,8 +1636,16 @@ function App() {
   this.Export=function(){
     this.Layout();
     var cvwork=document.getElementById("exportcanvas");
-    cvwork.width=this.exportwidth;
-    cvwork.height=this.exportheight*this.exportframes;
+    switch(this.exporttype){
+    case "vert":
+      cvwork.width=this.exportwidth;
+      cvwork.height=this.exportheight*this.exportframes;
+      break;
+    case "horz":
+      cvwork.width=this.exportwidth*this.exportframes;
+      cvwork.height=this.exportheight;
+      break;
+    }
     var s=document.getElementById("exportpane");
     s.style.display="block";
     var ctx=cvwork.getContext("2d");
@@ -1651,14 +1663,27 @@ function App() {
       }
       this.Render();
       this.img[i].src=this.renderer.domElement.toDataURL();
-      this.img[i].i=i;
+      switch(this.exporttype){
+      case "horz":
+        this.img[i].posx=i*this.exportheight;
+        this.img[i].posy=0;
+        break;
+      case "vert":
+        this.img[i].posx=0;
+        this.img[i].posy=i*this.exportwidth;
+        break;
+      }
       this.img[i].onload=function(){
-        ctx.drawImage(this,0,this.i*app.exportheight,app.exportwidth,app.exportheight);
+        ctx.drawImage(this,this.posx,this.posy,app.exportwidth,app.exportheight);
       }
     }
   }
   this.Setup=function(n,v){
     switch(n){
+    case "exporttype":
+      this.exporttype=v;
+      this.Export();
+      break;
     case "exportwidth":
       this.exportwidth=parseFloat(v);
       break;
@@ -1834,9 +1859,18 @@ function App() {
     document.getElementById("effbase").style.height=(window.innerHeight-427)+"px";
     document.getElementById("effpane").style.height=(window.innerHeight-457)+"px";
     document.getElementById("prevbase").style.top=(window.innerHeight-400)+"px";
-    document.getElementById("exportframe").style.width=(this.exportwidth+200)+"px";
-    document.getElementById("exportframe2").style.width=(this.exportwidth+50)+"px";
-    document.getElementById("exportframe3").style.left=(this.exportwidth+70)+"px";
+    if(this.exporttype=="horz"){
+      document.getElementById("exportframe").style.width="95%";
+      document.getElementById("exportframe").style.height=Math.max(250,(this.exportheight+50))+"px";
+      document.getElementById("exportframe2").style.width="80%";
+      document.getElementById("exportframe3").style.left="85%";
+    }
+    else{
+      document.getElementById("exportframe").style.height="95%";
+      document.getElementById("exportframe").style.width=(this.exportwidth+200)+"px";
+      document.getElementById("exportframe2").style.width=(this.exportwidth+50)+"px";
+      document.getElementById("exportframe3").style.left=(this.exportwidth+70)+"px";
+    }
 //    document.getElementById("dlgpane").style.height=(window.innerHeight-95)+"px";
 //    document.getElementById("exportpane").style.height=(window.innerHeight-95)+"px";
   };
@@ -1963,7 +1997,7 @@ function App() {
     l2.prim.aspect=l1.prim.aspect;
     l2.prim.round=l1.prim.round;
     l2.prim.wave=l1.prim.wave;
-    l2.prim.waveangle.l1.prim.waveangle;
+    l2.prim.waveangle=l1.prim.waveangle;
     l2.prim.emboss=l1.prim.emboss;
     l2.prim.embossdiffuse=l1.prim.embossdiffuse;
     l2.prim.height=l1.prim.height;
@@ -2077,7 +2111,9 @@ window.addEventListener("DOMContentLoaded", Init, false);
 <div id="header">
   <img id="logo" src="images/g200kg160x80.png" height="60"/>
   <div style="position:absolute;top:8px;left:180px;font-family:'AudioWide',sans-serif;font-size:30px;">KnobMan3D</div>
-  <div style="position:absolute;top:40px;left:180px;">Knob Image Designer  g200kg</div>
+  <div style="position:absolute;top:40px;left:180px;">Knob Image Designer by g200kg</div>
+  <div style="float:right;margin:5px"><a href="http://www.g200kg.com" style="color:#ccc"/>http://www.g200kg.com/</a><br/>
+  <a href="https://github.com/g200kg/knobman3d" style="color:#ccc"/>GitHub repository</a></div>
 </div>
 <div id="main">
 <div id="menupane">
@@ -2288,6 +2324,7 @@ window.addEventListener("DOMContentLoaded", Init, false);
       <canvas id="exportcanvas" width="512" height="512"></canvas>
     </div>
     <div id="exportframe3">
+      <div class="exprow"><div class="explabel">type:</div><select id="exporttype" onchange="app.Setup('exporttype',this.value)"><option value="vert">Vertical stitch</option><option value="horz">Horizontal stitch</option></select></div>
       <div class="exprow"><div class="explabel">width:</div><input id="exportwidth" type="text" size="3" onchange="app.Setup('exportwidth',this.value)"/></div>
       <div class="exprow"><div class="explabel">height:</div><input id="exportheight" type="text" size="3" onchange="app.Setup('exportheight',this.value)"/></div>
       <div class="exprow"><div class="explabel">frames:</div><input id="exportframes" type="text" size="3" onchange="app.Setup('exportframes',this.value)"/></div>
