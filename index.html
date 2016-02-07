@@ -1594,7 +1594,7 @@ function App() {
       Set(p.eff,"alphaanim",l.eff.alphaa);
       Set(p.eff,"brightness1",l.eff.bright1);
       Set(p.eff,"brightness2",l.eff.bright2);
-      Set(p.eff,"brightnessanim",l.eff.brigha);
+      Set(p.eff,"brightnessanim",l.eff.brighta);
       Set(p.eff,"hue1",l.eff.hue1);
       Set(p.eff,"hue2",l.eff.hue2);
       Set(p.eff,"hueanim",l.eff.huea);
@@ -1665,12 +1665,12 @@ function App() {
       this.img[i].src=this.renderer.domElement.toDataURL();
       switch(this.exporttype){
       case "horz":
-        this.img[i].posx=i*this.exportheight;
+        this.img[i].posx=i*this.exportwidth;
         this.img[i].posy=0;
         break;
       case "vert":
         this.img[i].posx=0;
-        this.img[i].posy=i*this.exportwidth;
+        this.img[i].posy=i*this.exportheight;
         break;
       }
       this.img[i].onload=function(){
