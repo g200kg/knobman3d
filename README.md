@@ -16,7 +16,7 @@ KnobMan3D is a Knob Image (film-strip) design tool based on WebGL + THREE.js
 [Sample-objects](http://g200kg.github.io/knobman3d/?d=eyJjYW15IjoiLTczIiwid2lkdGgiOjY0LCJoZWlnaHQiOjY0LCJmcmFtZXMiOjE3LCJsYXllciI6W3sibmFtZSI6Ik9iajEiLCJwcmltIjp7InR5cGUiOiJjeWxpbmRlciIsInNtb290aCI6MTAwLCJoZWlnaHQiOjEwLCJzaGluaW5lc3MiOjQsInRleHR1cmUiOiJQbGFudCIsInRleGRlcHRoIjotMTgsInRleHpvb20iOjI2LCJjb2xvciI6MTU5MDY5NjF9LCJlZmYiOnsib2Zmc2V0eDEiOi0zOCwib2Zmc2V0eTEiOjQwLCJhbmdsZTEiOi03NiwiYW5nbGUyIjo5MSwiYW5nbGVhIjoiMCJ9fSx7Im5hbWUiOiJPYmoyIiwicHJpbSI6eyJ0eXBlIjoiY3lsaW5kZXIiLCJkZWZsYXRlIjozMCwic21vb3RoIjozMiwiaGVpZ2h0IjozMSwidGV4dHVyZSI6IkF1cmEiLCJjb2xvciI6ODA4MTQ2M30sImVmZiI6eyJ6b29teDEiOjU3LCJvZmZzZXR4MSI6LTM0LCJvZmZzZXR5MSI6LTUxLCJhbmdsZTEiOi03MiwiYW5nbGVhIjoiMCJ9fSx7Im5hbWUiOiJPYmozIiwicHJpbSI6eyJ0eXBlIjoiY3ViZSIsInJvdW5kIjoyNiwic21vb3RoIjoyMCwiaGVpZ2h0IjozMCwidGV4dHVyZSI6IlNhbmQiLCJ0ZXhkZXB0aCI6MTEsInRleHpvb20iOjIwMCwiY29sb3IiOjk4NzAxMjl9LCJlZmYiOnsiem9vbXgxIjo0NSwib2Zmc2V0eTEiOjQ5LCJhbmdsZTEiOi0yMywiYW5nbGUyIjoxMzcsImFuZ2xlYSI6IjAifX1dfQ==)  
 
 
-![](samples/simple.png) ![](samples/waveknob.png) ![](samples/knurling.png) ![](samples/led.png) ![](images/objects.png)
+![](samples/simple.png) ![](samples/waveknob.png) ![](samples/knurling.png) ![](samples/led.png) ![](samples/objects.png)
 
 
 Available at :
