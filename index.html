@@ -912,7 +912,18 @@ function Primitive(app,ly){
   this.MatSetup=function(){
     this.material.bumpScale=this.texdepth*.05;
     this.material.shininess=this.shininess;
-//    this.material.color=this.color;
+    switch(this.textype){
+    case "bump":
+      this.material.bumpMap=this.app.texture[this.texture].tex;
+      this.material.map=null;
+      break;
+    case "normal":
+      this.material.bumpMap=null;
+      this.material.map=this.app.texture[this.texture].tex;
+      break;
+    }
+    this.material.color=new THREE.Color(this.color);
+    this.material.needsUpdate=true;
   }
   this.MeshSetup=function(){
     switch(this.type){
@@ -1117,18 +1128,21 @@ function Layer(app,n){
     switch(n){
     case "visible":
       this.visible=v;
-      this.prim.mesh.visible=this.visible;
+      this.prim.mesh.visible=this.visible&&this.prim.type!="none";
 //      this.prim.MeshSetup();
       break;
     case "color":
       this.prim.color=((v.r|0)<<16)+((v.g|0)<<8)+((v.b|0));
-      this.prim.Rebuild();
-      this.prim.MeshSetup();
+//      this.prim.Rebuild();
+//      this.prim.MeshSetup();
+      this.prim.MatSetup();
       break;
     case "type":
       this.prim.type=v;
-      this.prim.Rebuild();
+      this.prim.mesh.visible=this.visible&&this.prim.type!="none";
+//      this.prim.Rebuild();
       this.prim.MeshSetup();
+      this.prim.geometry.uvsNeedUpdate=true;
       this.app.UpdateLayerPane();
       break;
     case "aspect":
@@ -1184,13 +1198,15 @@ function Layer(app,n){
       break;
     case "texture":
       this.prim.texture=v;
-      this.prim.Rebuild();
-      this.prim.MeshSetup();
+      this.prim.MatSetup();
+//      this.prim.Rebuild();
+//      this.prim.MeshSetup();
       break;
     case "textype":
       this.prim.textype=v;
-      this.prim.Rebuild();
-      this.prim.MeshSetup();
+//      this.prim.Rebuild();
+//      this.prim.MeshSetup();
+      this.prim.MatSetup();
       break;
     case "texdepth":
       this.prim.texdepth=parseFloat(v);

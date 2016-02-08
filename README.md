@@ -32,4 +32,5 @@ Sample knobs : licensed under Creative Commons Zero CC0
 THREE.js : MIT License  
 https://github.com/mrdoob/three.js/blob/master/LICENSE  
 
-jsgif (GIFEncoder.js/NeuQuant.js/LZWEncoder.js) :   https://github.com/antimatter15/jsgif/blob/master/LICENSE
+jsgif (GIFEncoder.js/NeuQuant.js/LZWEncoder.js) :  
+ https://github.com/antimatter15/jsgif/blob/master/LICENSE
