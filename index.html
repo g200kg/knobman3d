@@ -881,14 +881,15 @@ function Primitive(app,ly){
 //    this.material.metal=true;
 //    this.material.metal=true;
 //    this.meterial.emissive=true;
+    this.mesh=new THREE.Mesh( this.geometry, this.material );
+    this.mesh.position.set(0,0,0);
     switch(this.type){
     case "none":
-      this.mesh=null;
+      this.mesh.visible=false;
       break;
     case "cylinder":
     case "cube":
-      this.mesh=new THREE.Mesh( this.geometry, this.material );
-      this.mesh.position.set(0,0,0);
+      this.mesh.visible=true;
       break;
     }
     if(this.mesh){
