@@ -867,7 +867,7 @@ function Primitive(app,ly){
       this.material=new THREE.MeshPhongMaterial( { color:this.color, map:this.app.texture[this.texture].tex, transparent:true } );
       break;
     }
-    this.material.bumpScale=this.texdepth*.05;
+    this.material.bumpScale=this.texdepth*.01;
     this.material.shininess=this.shininess;
     this.material.shading = THREE.FlatShading;
     if(this.metalic>=50){
@@ -911,7 +911,7 @@ function Primitive(app,ly){
     return [x,y];
   };
   this.MatSetup=function(){
-    this.material.bumpScale=this.texdepth*.05;
+    this.material.bumpScale=this.texdepth*.01;
     this.material.shininess=this.shininess;
     switch(this.textype){
     case "bump":
@@ -1352,45 +1352,74 @@ function Layer(app,n){
     app.Render();
   }
 }
+function Background(app){
+  this.app=app;
+  this.color=0xffffff;
+  this.geometry=new THREE.Geometry();
+  this.geometry.vertices.push(
+    new THREE.Vector3(-500,-500),new THREE.Vector3(500,-500),new THREE.Vector3(500,500),new THREE.Vector3(-500,500)
+  );
+  this.geometry.faces.push(
+    new THREE.Face3(0,1,2,new THREE.Vector3(0,0,1)), new THREE.Face3(2,3,0,new THREE.Vector3(0,0,1))
+  );
+  this.geometry.computeFaceNormals();
+  this.geometry.computeVertexNormals();
+  this.mesh=new THREE.Mesh(this.geometry,new THREE.MeshLambertMaterial({color:0xffffffff}));
+  this.mesh.receiveShadow=true;
+  app.scene.add(this.mesh);
+  console.log(this.mesh);
+}
 function Lighting(app){
   this.app=app;
   this.ambient=30;
   this.intensity=100;
+  this.shadowdensity=30;
+  this.lightdir = -45;
+  this.lightoffset = 20;
   this.light1 = new THREE.DirectionalLight(0xffffff,1);
-//  this.light2 = new THREE.DirectionalLight(0xffffff,0.1);
-//  this.light1 = new THREE.SpotLight(0xffffff,1,0,Math.PI/3,10,10);
-  this.light1.position.set( -200, 200, 200 );
-//  this.light2.position.set( 150, 200, 200 );
-//  this.light1.shadow.mapSize.x=3072;
-//  this.light1.shadow.mapSize.y=2048;
-// this.light1.shadow.bias=0.0001;
+//  this.light1.position.set( -200, 200, 200 );
+//  var thd=this.lightdir*Math.PI/180;
+//  var tho=this.lightoffset*Math.PI/180;
+//  this.light1.position.set(Math.sin(thd)*Math.sin(tho)*200,Math.cos(thd)*Math.sin(tho)*200,Math.cos(tho)*200);
   this.light1.shadow.mapSize.x=2048;
   this.light1.shadow.mapSize.y=2048;
   this.light1.shadow.bias=0.0002;
   this.light1.castShadow=true;
   app.scene.add(this.light1);
-
-//  this.light2.shadow.mapSize.x=2048;
-//  this.light2.shadow.mapSize.y=2048;
-//  this.light2.shadow.bias=0.0002;
-//  this.light2.castShadow=true;
-//  app.scene.add(this.light2);
-
-
   this.light0 = new THREE.AmbientLight(0x404040);
   app.scene.add(this.light0);
   document.getElementById("ambient").value=this.ambient;
   document.getElementById("intensity").value=this.intensity;
+  document.getElementById("shadowdensity").value=this.shadowdensity;
+  document.getElementById("lightdir").value=this.lightdir;
+  document.getElementById("lightoffset").value=this.lightoffset;
+  this.SetLightPos=function(offd,offo){
+    var thd=(this.lightdir+offd)*Math.PI/180;
+    var tho=(this.lightoffset+offo)*Math.PI/180;
+    this.light1.position.set(Math.sin(thd)*Math.sin(tho)*200,Math.cos(thd)*Math.sin(tho)*200,Math.cos(tho)*200);
+  };
   this.Setup=function(n,v){
     switch(n){
     case "intensity":
-      this.intensity=v;
+      this.intensity=parseFloat(v);
       this.light1.intensity=v/100;
       this.app.Render();
       break;
     case "ambient":
-      this.ambient=v;
+      this.ambient=parseFloat(v);
       this.light0.color.r=this.light0.color.g=this.light0.color.b=(v/100);
+      this.app.Render();
+      break;
+    case "shadowdensity":
+      this.shadowdensity=parseFloat(v);
+      this.app.Render();
+      break;
+    case "lightdir":
+      this.lightdir=parseFloat(v);
+      this.app.Render();
+      break;
+    case "lightoffset":
+      this.lightoffset=parseFloat(v);
       this.app.Render();
       break;
     }
@@ -1404,6 +1433,9 @@ function KnobData(ap) {
   Def(this,"camy",ap.camy,null);
   Def(this,"ambient",ap.lighting.ambient,30);
   Def(this,"intensity",ap.lighting.intensity,100);
+  Def(this,"shadowdensity",ap.lighting.shadowdensity,30);
+  Def(this,"lightdir",ap.lighting.lightdir,-45);
+  Def(this,"lightoffset",ap.lighting.lightoffset,45);
   Def(this,"camzoom",ap.camzoom,100);
   this.exporttype=ap.exporttype;
   this.width=ap.exportwidth;
@@ -1483,6 +1515,7 @@ function App() {
   this.exportwidth=64;
   this.exportheight=64;
   this.exportframes=17;
+  this.exportexec=null;
   document.getElementById("exporttype").value=this.exporttype;
   document.getElementById("exportwidth").value=this.exportwidth;
   document.getElementById("exportheight").value=this.exportheight;
@@ -1499,13 +1532,12 @@ function App() {
   this.camera.position.set( 0, 0, 200 );
   this.renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
   this.renderer.setClearColor(0x000000,0);
-//  this.renderer = new THREE.CanvasRenderer({ antialias:true });
   this.renderer.shadowMap.enabled = true;
   this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-//  console.log(this.renderer);
   this.renderer.setSize(this.width, this.height);
-  document.getElementById("prevpane").appendChild(this.renderer.domElement );
-//  console.log(document.getElementById("prevpane").childNodes[1]);
+  this.rendercv=document.getElementById("render");
+  this.renderctx=this.rendercv.getContext("2d");
+//  document.getElementById("prevpane").appendChild(this.renderer.domElement );
   document.getElementById("prevpane").childNodes[1].style.border="1px solid #888";
   this.texloader=new THREE.TextureLoader();
   this.texture=[];
@@ -1535,12 +1567,61 @@ function App() {
     this.texture[this.texlist[i].name].tex.wrapT=THREE.RepeatWrapping;
   }
   this.lighting=new Lighting(this);
+  this.background=new Background(this);
+
   this.layer=[];
   this.layer[0]=new Layer(this,0);
   this.layer[1]=new Layer(this,1);
   this.layer[2]=new Layer(this,2);
   this.Render=function(){
-    this.renderer.render(this.scene, this.camera);
+    var cv1=document.getElementById("cvwork1");
+    var ctx1=cv1.getContext("2d");
+    this.background.mesh.visible=true;
+    this.lighting.SetLightPos(0,0);
+    this.background.mesh.receiveShadow=false;
+    this.background.mesh.material.needsUpdate=true;
+    this.renderer.render(this.scene,this.camera);
+    ctx1.drawImage(this.renderer.domElement,0,0);
+    var imgd1=ctx1.getImageData(0,0,256,256);
+    this.background.mesh.receiveShadow=true;
+    this.background.mesh.material.needsUpdate=true;
+    this.renderer.render(this.scene,this.camera);
+    this.renderctx.drawImage(this.renderer.domElement,0,0);
+    var imgd2=this.renderctx.getImageData(0,0,256,256);
+    for(xx=0;xx<65536;++xx){
+      var xxx=xx*4;
+      var d=imgd1.data[xx*4]-imgd2.data[xx*4];
+      imgd1.data[xxx]=0;
+      imgd1.data[xxx+1]=0;
+      imgd1.data[xxx+2]=0;
+      imgd1.data[xxx+3]=d;
+    }
+    ctx1.putImageData(imgd1,0,0);
+    this.renderctx.clearRect(0,0,256,256);
+    var n=0;
+    var d=this.lighting.shadowdensity*0.01;
+    for(yy=-5;yy<=5;++yy){
+      for(xx=-5;xx<=5;++xx){
+        var r=d/++n;
+        this.renderctx.globalAlpha=r;
+        this.renderctx.drawImage(cv1,xx,yy);
+      }
+    }
+    this.renderctx.globalAlpha=1;
+    this.background.mesh.visible=false;
+    this.renderer.render(this.scene,this.camera);
+    this.renderctx.drawImage(this.renderer.domElement,0,0);
+/*    var n=0;
+    for(var xx=-2;xx<=2;xx+=2){
+      for(var yy=-2;yy<=2;yy+=2){
+        var r=1.0/++n;
+        this.lighting.SetLightPos(xx,yy);
+        this.renderer.render(this.scene, this.camera);
+        this.renderctx.globalAlpha=r;
+        this.renderctx.drawImage(this.renderer.domElement,0,0);
+      }
+    }
+*/
   };
   this.SetupCam=function(){
     this.camxx=this.camx/180*Math.PI;
@@ -1567,6 +1648,7 @@ function App() {
     Set(app,"camy",k.camy,"camy","v");
     Set(app,"ambient",k.ambient,"ambient","v");
     Set(app,"intensity",k.intensity,"intensity","v");
+    Set(app,"shadowdensity",k.shadowdensity,"shadowdensity","v");
     Set(app,"camzoom",k.camzoom,"camzoom","v");
     Set(app,"exporttype",k.type,"exporttype","v");
     Set(app,"exportwidth",k.width,"exportwidth","v");
@@ -1663,6 +1745,15 @@ function App() {
     }
   };
   this.Export=function(){
+    this.exportexec=this.ExportExec();
+    this.ExportLoop();
+  };
+  this.ExportLoop=function(){
+    if(this.exportexec.next().done==false){
+      setTimeout(this.ExportLoop.bind(this),10);
+    }
+  };
+  this.ExportExec=function*(){
     this.Layout();
     var enc;
     var cvwork=document.getElementById("exportcanvas");
@@ -1700,19 +1791,20 @@ function App() {
       this.Render();
       switch(this.exporttype){
       case "horz":
-        ctx.drawImage(this.renderer.domElement,i*this.exportwidth,0,this.exportwidth,this.exportheight);
+        ctx.drawImage(this.rendercv,i*this.exportwidth,0,this.exportwidth,this.exportheight);
         break;
       case "vert":
-        ctx.drawImage(this.renderer.domElement,0,i*this.exportheight,this.exportwidth,this.exportheight);
+        ctx.drawImage(this.rendercv,0,i*this.exportheight,this.exportwidth,this.exportheight);
         break;
       case "gifanim":
         ctx.fillStyle="#ffffff";
         ctx.fillRect(0,0,this.exportwidth,this.exportheight);
 //        ctx.clearRect(0,0,this.exportwidth,this.exportheight);
-        ctx.drawImage(this.renderer.domElement,0,0,this.exportwidth,this.exportheight);
+        ctx.drawImage(this.rendercv,0,0,this.exportwidth,this.exportheight);
         enc.addFrame(ctx);
         break;
       }
+      yield i;
     }
     if(this.exporttype=="gifanim"){
       if(this.exportshuttle){
@@ -1727,7 +1819,7 @@ function App() {
           this.Render();
           ctx.fillStyle="#ffffff";
           ctx.fillRect(0,0,this.exportwidth,this.exportheight);
-          ctx.drawImage(this.renderer.domElement,0,0,this.exportwidth,this.exportheight);
+          ctx.drawImage(this.rendercv,0,0,this.exportwidth,this.exportheight);
           enc.addFrame(ctx);
         }
       }
@@ -1759,6 +1851,9 @@ function App() {
       this.exportshuttle=v;
     case "ambient":
     case "intensity":
+    case "shadowdensity":
+    case "lightdir":
+    case "lightoffset":
       this.lighting.Setup(n,v);
       break;
     case "camx":
@@ -1780,7 +1875,7 @@ function App() {
       this.SetupCam();
       this.Render();
       break;
-    case "ratio":
+    case "frame":
       this.curRatio=parseFloat(v);
       for(var i=0;this.layer[i];++i){
         this.layer[i].eff.Apply(this.curRatio);
@@ -1967,6 +2062,7 @@ function App() {
   }
   this.Animate=function(){
       app.curRatio+=app.animatedir*0.01;
+      document.getElementById("frame").value=app.curRatio;
       if(app.curRatio>1 || app.curRatio<0){
         app.animatedir=-app.animatedir;
         app.curRatio+=app.animatedir*0.01;
@@ -2275,13 +2371,14 @@ window.addEventListener("DOMContentLoaded", Init, false);
   <option value="normal">Normal</option>
   <option value="bump" selected>Bump</option>
 </select></div>
-<div class="primrow"><div class="primlabel">TexDepth:</div> <input id="texdepth" type="text" value="1" size="10" oninput="app.Setup('texdepth',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'texdepth',-100,100)"></button></div>
+<div class="primrow"><div class="primlabel">TexDepth:</div> <input id="texdepth" type="text" value="1" size="10" oninput="app.Setup('texdepth',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'texdepth',-200,200)"></button></div>
 <div class="primrow"><div class="primlabel">TexZoom:</div> <input id="texzoom" type="text" value="1" size="10" oninput="app.Setup('texzoom',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'texzoom',0,200)"></button></div>
 </div>
 </div>
 <div id="prevbase">
   <div class="panetitle">-- Rendering --</div>
 <div id="prevpane">
+  <canvas id="render" width="256" height="256"></canvas>
 </div>
 <input id="camysli" type="range" min="-90" max="90" value="-30" oninput="app.Setup('camy',this.value)" style="position:absolute;top:175px;left:220px;display:block;width:120px;transform:rotate(-90deg)"/>
 <input id="camxsli" type="range" min="-90" max="90" value="0" oninput="app.Setup('camx',this.value)" style="position:absolute;top:280px;left:120px;display:block;width:120px"/>
@@ -2294,8 +2391,21 @@ window.addEventListener("DOMContentLoaded", Init, false);
     <div class="efflabel">Ambient:</div>
     <input id="ambient" type="text" value="0" size="6" oninput="app.lighting.Setup('ambient',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'ambient',0,100)"></button>
   </div>
-  <div class="effrow"><div class="efflabel">Intensity:</div>
+  <div class="effrow">
+    <div class="efflabel">Intensity:</div>
     <input id="intensity" type="text" value="0" size="6" oninput="app.lighting.Setup('intensity',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'intensity',0,400)"></button>
+  </div>
+  <div class="effrow">
+    <div class="efflabel">Shadow:</div>
+    <input id="shadowdensity" type="text" value="0" size="6" oninput="app.lighting.Setup('shadowdensity',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'shadowdensity',0,100)"></button>
+  </div>
+  <div class="effrow">
+    <div class="efflabel">LightDir:</div>
+    <input id="lightdir" type="text" value="0" size="6" oninput="app.lighting.Setup('lightdir',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'lightdir',-360,360)"></button>
+  </div>
+  <div class="effrow">
+    <div class="efflabel">LightOffset:</div>
+    <input id="lightoffset" type="text" value="0" size="6" oninput="app.lighting.Setup('lightoffset',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'lightoffset',-360,360)"></button>
   </div>
   <div class="effrow">-- Camera --</div>
   <div class="effrow"><div class="efflabel">CamZoom:</div>
@@ -2303,7 +2413,7 @@ window.addEventListener("DOMContentLoaded", Init, false);
   </div>
   <div class="effrow">-- Animate --</div>
   <div class="effrow"><div class="efflabel">Frame:</div>
-  <input type="range" min="0" max="1" step="0.001" value="0" oninput="app.Setup('ratio',this.value)"/>
+  <input id="frame" type="range" min="0" max="1" step="0.001" value="0" oninput="app.Setup('frame',this.value)" style="width:100px"/>
   </div>
   <button id="animate" onclick="app.AnimStart()">Animate</button>
 
@@ -2431,6 +2541,7 @@ window.addEventListener("DOMContentLoaded", Init, false);
   </div>
 </div>
 
+<canvas id="cvwork1" width="256" height="256" style="display:none"></canvas>
 
 </body>
 </html>
