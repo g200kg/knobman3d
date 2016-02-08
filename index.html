@@ -75,6 +75,7 @@ body{
   margin:2px 0px;
 }
 .explabel{
+  display:inline-block;
   color:white;
   width:80px;
 }
@@ -339,6 +340,9 @@ body{
 </style>
 <script src="three.min.js"></script>
 <script src="threeCSG.js"></script>
+<script src="LZWEncoder.js"></script>
+<script src="NeuQuant.js"></script>
+<script src="GIFEncoder.js"></script>
 <script>
 var app;
 var layermax=16;
@@ -858,7 +862,6 @@ function Primitive(app,ly){
     switch(this.textype){
     case "bump":
       this.material=new THREE.MeshPhongMaterial( { color:this.color, bumpMap:this.app.texture[this.texture].tex, transparent:true } );
-//      console.log(this.material);
       break;
     case "normal":
       this.material=new THREE.MeshPhongMaterial( { color:this.color, map:this.app.texture[this.texture].tex, transparent:true } );
@@ -1625,16 +1628,26 @@ function App() {
     document.getElementById("saveurl").value=s;
   }
   this.Download=function(){
-    var cvwork=document.getElementById("exportcanvas");
-    var s=cvwork.toDataURL();
-//    console.log(s);
-    var a=document.createElement('a');
-    a.download="knob.png";
-    a.href="data:application/octet-stream;base64,"+s.split(",")[1];
-    a.click();
+    var s,a;
+    if(this.exporttype=="gifanim"){
+      s=document.getElementById("exportimg").src;
+      a=document.createElement('a');
+      a.download="knob.gif";
+      a.href=s;
+      a.click();
+    }
+    else{
+      var cvwork=document.getElementById("exportcanvas");
+      s=cvwork.toDataURL();
+      a=document.createElement('a');
+      a.download="knob.png";
+      a.href="data:application/octet-stream;base64,"+s.split(",")[1];
+      a.click();
+    }
   };
   this.Export=function(){
     this.Layout();
+    var enc;
     var cvwork=document.getElementById("exportcanvas");
     switch(this.exporttype){
     case "vert":
@@ -1645,13 +1658,19 @@ function App() {
       cvwork.width=this.exportwidth*this.exportframes;
       cvwork.height=this.exportheight;
       break;
+    case "gifanim":
+      cvwork.width=this.exportwidth;
+      cvwork.height=this.exportheight;
+      enc=new GIFEncoder();
+      enc.setRepeat(0);
+      enc.setDelay(100);
+//      enc.setSize(this.exportWidth,this.exportheight);
+      enc.start();
+      break;
     }
     var s=document.getElementById("exportpane");
     s.style.display="block";
     var ctx=cvwork.getContext("2d");
-    this.img=[];
-    for(var i=0;i<this.exportframes;++i)
-      this.img[i]=new Image();
     for(var i=0;i<this.exportframes;++i){
       var r;
       if(this.exportframes<2)
@@ -1662,20 +1681,46 @@ function App() {
         this.layer[j].eff.Apply(r);
       }
       this.Render();
-      this.img[i].src=this.renderer.domElement.toDataURL();
       switch(this.exporttype){
       case "horz":
-        this.img[i].posx=i*this.exportwidth;
-        this.img[i].posy=0;
+        ctx.drawImage(this.renderer.domElement,i*this.exportwidth,0,this.exportwidth,this.exportheight);
         break;
       case "vert":
-        this.img[i].posx=0;
-        this.img[i].posy=i*this.exportheight;
+        ctx.drawImage(this.renderer.domElement,0,i*this.exportheight,this.exportwidth,this.exportheight);
+        break;
+      case "gifanim":
+        ctx.fillStyle="#ffffff";
+        ctx.fillRect(0,0,this.exportwidth,this.exportheight);
+//        ctx.clearRect(0,0,this.exportwidth,this.exportheight);
+        ctx.drawImage(this.renderer.domElement,0,0,this.exportwidth,this.exportheight);
+        enc.addFrame(ctx);
         break;
       }
-      this.img[i].onload=function(){
-        ctx.drawImage(this,this.posx,this.posy,app.exportwidth,app.exportheight);
+    }
+    if(this.exporttype=="gifanim"){
+      if(this.exportshuttle){
+        for(var i=this.exportframes-2;i>0;--i){
+          var r;
+          if(this.exportframes<2)
+            r=0;
+          else
+            r=i/(this.exportframes-1);
+          for(var j=0;this.layer[j];++j)
+            this.layer[j].eff.Apply(r);
+          this.Render();
+          ctx.fillStyle="#ffffff";
+          ctx.fillRect(0,0,this.exportwidth,this.exportheight);
+          ctx.drawImage(this.renderer.domElement,0,0,this.exportwidth,this.exportheight);
+          enc.addFrame(ctx);
+        }
       }
+      enc.finish();
+      var bin=new Uint8Array(enc.stream().bin);
+      this.blob=new Blob([bin.buffer],{type:"image/gif"});
+      document.getElementById("exportimg").src=URL.createObjectURL(this.blob);
+//      document.getElementById("exportimg").onload=function(){
+//        URL.revokeObjectURL(url);
+//      }
     }
   }
   this.Setup=function(n,v){
@@ -1693,6 +1738,8 @@ function App() {
     case "exportframes":
       this.exportframes=parseFloat(v);
       break;
+    case "exportshuttle":
+      this.exportshuttle=v;
     case "ambient":
     case "intensity":
       this.lighting.Setup(n,v);
@@ -1859,23 +1906,39 @@ function App() {
     document.getElementById("effbase").style.height=(window.innerHeight-427)+"px";
     document.getElementById("effpane").style.height=(window.innerHeight-457)+"px";
     document.getElementById("prevbase").style.top=(window.innerHeight-400)+"px";
-    if(this.exporttype=="horz"){
+    document.getElementById("exportframe3").style.width="220px";
+    switch(this.exporttype){
+    case "horz":
       document.getElementById("exportframe").style.width="95%";
+      var w=document.getElementById("exportframe").clientWidth;
       document.getElementById("exportframe").style.height=Math.max(250,(this.exportheight+50))+"px";
-      document.getElementById("exportframe2").style.width="80%";
-      document.getElementById("exportframe3").style.left="85%";
-    }
-    else{
+      document.getElementById("exportframe2").style.width=(w-300)+"px";
+      document.getElementById("exportframe3").style.left=(w-250)+"px";
+      document.getElementById("exportcanvas").style.display="block";
+      document.getElementById("exportimg").style.display="none";
+      break;
+    case "vert":
       document.getElementById("exportframe").style.height="95%";
-      document.getElementById("exportframe").style.width=(this.exportwidth+200)+"px";
+      document.getElementById("exportframe").style.width=(this.exportwidth+300)+"px";
       document.getElementById("exportframe2").style.width=(this.exportwidth+50)+"px";
       document.getElementById("exportframe3").style.left=(this.exportwidth+70)+"px";
+      document.getElementById("exportcanvas").style.display="block";
+      document.getElementById("exportimg").style.display="none";
+      break;
+    case "gifanim":
+      document.getElementById("exportframe").style.height=Math.max(250,(this.exportheight+50))+"px";
+      document.getElementById("exportframe").style.width=(this.exportwidth+400)+"px";
+      document.getElementById("exportframe2").style.width=(this.exportwidth+50)+"px";
+      document.getElementById("exportframe3").style.left=(this.exportwidth+70)+"px";
+      document.getElementById("exportcanvas").style.display="none";
+      document.getElementById("exportimg").style.display="block";
+      break;
     }
 //    document.getElementById("dlgpane").style.height=(window.innerHeight-95)+"px";
 //    document.getElementById("exportpane").style.height=(window.innerHeight-95)+"px";
   };
   this.Layout();
-  window.addEventListener("resize",this.Layout);
+  window.addEventListener("resize",this.Layout.bind(this));
   this.SetVisible=function(n,f){
     this.layer[n].Setup("visible",f);
   }
@@ -2322,12 +2385,14 @@ window.addEventListener("DOMContentLoaded", Init, false);
   <div id="exportframe">
     <div id="exportframe2">
       <canvas id="exportcanvas" width="512" height="512"></canvas>
+      <img id="exportimg"/>
     </div>
     <div id="exportframe3">
-      <div class="exprow"><div class="explabel">type:</div><select id="exporttype" onchange="app.Setup('exporttype',this.value)"><option value="vert">Vertical stitch</option><option value="horz">Horizontal stitch</option></select></div>
+      <div class="exprow"><div class="explabel">type:</div><select id="exporttype" onchange="app.Setup('exporttype',this.value)"><option value="vert">Vertical stitch</option><option value="horz">Horizontal stitch</option><option value="gifanim">GIF animation</option></select></div>
       <div class="exprow"><div class="explabel">width:</div><input id="exportwidth" type="text" size="3" onchange="app.Setup('exportwidth',this.value)"/></div>
       <div class="exprow"><div class="explabel">height:</div><input id="exportheight" type="text" size="3" onchange="app.Setup('exportheight',this.value)"/></div>
       <div class="exprow"><div class="explabel">frames:</div><input id="exportframes" type="text" size="3" onchange="app.Setup('exportframes',this.value)"/></div>
+      <div class="exprow"><div class="explabel">Shuttle(for animation):</div><input id="exportshuttle" type="checkbox" onchange="app.Setup('exportshuttle',this.checked)"/></div>
       <button onclick="app.Export()">Apply</button>
       <button onclick="app.Download()">Download</button>
       <button onclick="app.CloseExport()">Close</button>

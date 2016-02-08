@@ -22,7 +22,13 @@ Available at :
   [http://g200kg.github.io/knobman3d/](http://g200kg.github.io/knobman3d/)
 
 ## License
-KnobMan3D is lisences under MIT License  
-Copyright (c) 2016 g200kg  http://www.g200kg.com/  
+ Copyright (c) 2016 g200kg http://www.g200kg.com/  
 
-Sample knobs are licensed under Creative Commons Zero CC0
+KnobMan3D : licensed under MIT License.   
+Sample knobs : licensed under Creative Commons Zero CC0
+
+#### Used Libraries:
+THREE.js : MIT License  
+https://github.com/mrdoob/three.js/blob/master/LICENSE  
+
+jsgif (GIFEncoder.js/NeuQuant.js/LZWEncoder.js) : https://github.com/antimatter15/jsgif/blob/master/LICENSE
