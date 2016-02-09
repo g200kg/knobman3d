@@ -1,0 +1,557 @@
+<doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+<style>
+  body{
+    background:#333;
+    color:#ddd;
+    line-height: 140%;
+  }
+  h1, h2{
+    background:#642;
+    padding:10px;
+  }
+  table{
+    border:1px solid #ccc;
+    margin:4px;
+    box-shadow:1px 1px 2px 2px rgba(0,0,0,0.4);
+    border-radius: 3px;
+  }
+  tr{
+    background: #555;
+  }
+  td{
+    margin:4px;
+  }
+  a{
+    color:#fff;
+  }
+</style>
+<script>
+function ShowDoc(x) {
+	var divs=document.getElementsByTagName("div");
+	var t="doc_"+x;
+	for(var i=0;i<divs.length;++i) {
+		if(divs[i].className==="doc_ja")
+			divs[i].style.display=(x==="ja")?"block":"none";
+		if(divs[i].className=="doc_en")
+			divs[i].style.display=(x==="ja")?"none":"block";
+	}
+}
+function GetLang() {
+	return (navigator.language || navigator.browserLanguage).substring(0, 2);
+}
+</script>
+</head>
+<body>
+<h1>KnobMan3D</h1>
+<p>Copyright (c) 2016 g200kg</p>
+<p>2016/02/09</p>
+Available at : <b><a href="http://g200kg.github.io/knobman3d/" target="_blank">http://g200kg.github.io/knobman3d/</a></b><br/>
+GitHub Repositry : <b><a href="https://github.com/g200kg/knobman3d">https://github.com/g200kg/knobman3d</a></b>
+
+<br/><br/>
+<button onclick="ShowDoc('ja')">Japanese</button> : <button onclick="ShowDoc('en')">English</button>
+
+<div class="doc_ja">
+<h2>概要</h2>
+<p>KnobMan3Dはノブ画像を生成する事に特化した3Dモデリングツールです。
+モデルの作成は3Dのオブジェクトの組み合わせで行いますが出力は3Dデータではなく画像ファイルとなります。
+VSTプラグインの開発等で必要となるツマミの画像を繋げた「アニメーションノブ」のビットマップを作成できます。
+各画像のフレームが垂直または水平に接続された1枚の画像、またはアニメーションGIF画像として出力できます。
+</p>
+</div>
+<div class="doc_en">
+  <h2>Overview</h2>
+  <p>KnobMan3D is a 3D modeling tool for knob-filmstrip-image design.
+    Even the modeling is performed with combination of 3D objects, output will be done with  2D image files.
+    Especially, aiming the 'Animation knob bitmap' that will be used in the VST audio effects/synth development.
+    Each animation frame will be vertical / horizontal stitched, or combine to one AnimationGIF format.
+  </p>
+</div>
+
+
+<div class="doc_ja">
+<h2>機能</h2>
+<ul>
+  <li>複数の基本オブジェクトを組み合わせて画像を作成します</li>
+  <li>作成した画像はPNGまたはアニメーションGIFで出力できます</li>
+  <li>各オブジェクトに回転やズーム等のアニメーションエフェクトを付ける事ができます</li>
+</ul>
+<p>作成サンプル:</p>
+<img src="samples/simple-small.png"/><br/>
+<img src="samples/waveknob-small.png"/><br/>
+<img src="samples/led-small.png"/><br/>
+</div>
+<div class="doc_en">
+  <h2>Function</h2>
+  <ul>
+    <li>Create image with combination of multiple basic 3D objects.</li>
+    <li>Created images can be output as stitched PNG or AnimationGIF format.</li>
+    <li>Each 3D objects can be animation effected like rotation, zooming and so on.</li>
+  </ul>
+  <p>Samples:</p>
+  <img src="samples/simple-small.png"/><br/>
+  <img src="samples/waveknob-small.png"/><br/>
+  <img src="samples/led-small.png"/><br/>
+  </div>
+</div>
+
+<div class="doc_ja">
+<h2>動作環境</h2>
+<p>ウェブアプリですのでブラウザでKnobMan3Dのページを開けば動作します。
+ブラウザは Chrome / Firefox / Edge のいずれかで動作しますが、バージョンは最新版を使用してください。
+なお、Mac の場合 Yosemite では正常に色が表示されない事があります。最新の El Capitan を使用してください。
+</p>
+<p>また、最適化の関係で Firefox / Edge では動作が重くなる事があります。
+Chrome を使用するか、Rendering paneの "Shadow" 設定を 0 にするとかなり症状が改善されます。
+</p>
+</div>
+<div class="doc_en">
+  <h2>Environment</h2>
+  <p>KnobMan3D is a web applicaiton, you need just a browser to access to the URL.
+    Browser should be latest Chrome, Firefox or Edge.
+    If you use Mac, latest 'El Capitan' is needed. May be some color will not be displayed normally in Yosemite.
+  </p>
+  <p>Because of optimizing issue, Firefox or Edge might be slow response when editing parameters. Using Chrome or setting "Shadow" in Rendering pane to "0" might be a help.
+  </p>
+</div>
+
+<div class="doc_ja">
+<h2>UIの概要</h2>
+<p>UI画面には4つに分けられたペインとコマンドメニューがあります。それぞれの役割は次のようになっています。</p>
+<table>
+  <tr><td>Object list</td>
+    <td>配置した基本オブジェクトのリストが表示されます。デフォルトでは3個のオブジェクトだけが表示されていますが、コマンドメニューの操作で追加する事ができます。
+    サポートされる最大オブジェクト数は16です。</td>
+  </tr>
+  <tr><td>Object parameter</td>
+    <td>基本オブジェクトの形状や色などをこのパラメータで編集できます。</td>
+  </tr>
+  <tr><td>Effects</td>
+    <td>基本オブジェクトに対して追加のエフェクトを付加するためのパラメータです。各フレームに対してノブが回転したり色が変化する等のアニメーションはこのパラメータで設定します。</td>
+  </tr>
+  <tr><td>Rendering</td>
+    <td>生成した結果の画像を表示します。またライティング等の全体的な設定もここで設定します。</td>
+  </tr>
+</table>
+<img src="images/ui.png" width="500"/><br/>
+</div>
+<div class="doc_en">
+  <h2>UI Overview</h2>
+  <p>There are four panes and Command-menu in UI screen. Followings are description of these.
+  </p>
+  <table>
+    <tr><td>Object list</td>
+      <td>The list of deployed basic objects. Though there are three objects in default, you can add objects by menu. Currently, maximum number of objects is 16.
+      </td>
+    </tr>
+    <tr><td>Object parameter</td>
+      <td>The shapes or colors of basic objects settings.</td>
+    </tr>
+    <tr><td>Effects</td>
+      <td>Additional parameters for basic objects that allows animation e.g., rotations, color changing or so.
+      </td>
+    </tr>
+    <tr><td>Rendering</td>
+      <td>Display the rendering result. Also it has global settings of lighting or camera.</td>
+    </tr>
+  </table>
+  <img src="images/ui.png" width="500"/><br/>
+</div>
+
+<div class="doc_ja">
+<h2>コマンドメニュー</h2>
+<img src="images/menu.png"/><br/>
+これらはファイル操作、オブジェクトに対する操作を実行するボタンです。
+<table>
+  <tr><th>コマンド</th><th>説明</th></tr>
+  <tr><td>New</td>
+    <td>作成中のデータを消去します。</td>
+  </tr>
+  <tr><td>SaveAsURL</td>
+    <td>作成中のデータを表すURL形式の保存データを表示します。このURLをブラウザで開く事でデータの編集を再開できます。</td>
+  </tr>
+  <tr><td>Export</td>
+    <td>PNGまたはアニメーションGIF形式で画像ファイルとして出力します。このコマンドを実行するとエクスポートの詳細を指定するダイアログが開きます。</td>
+  </tr>
+  <tr><td>Add</td>
+    <td>オブジェクトを1つ追加します</td>
+  </tr>
+  <tr><td>Dup</td>
+    <td>現在フォーカスしているオブジェクトを複製します。</td>
+  </tr>
+  <tr><td>Del</td>
+    <td>現在フォーカスしているオブジェクトを削除します。</td>
+  </tr>
+  <tr><td>Back</td>
+    <td>現在フォーカスしているオブジェクトをObjList上1つ上に移動します。</td>
+  </tr>
+  <tr><td>Fore</td>
+    <td>現在フォーカスしているオブジェクトをObjList上1つ下に移動します。</td>
+  </tr>
+</table>
+</div>
+<div class="doc_en">
+  <h2>Command menu</h2>
+  <img src="images/menu.png"/><br/>
+  These are file or object manipulation command buttons.
+  <table>
+    <tr><th>Command</th><th>Description</th></tr>
+    <tr><td>New</td>
+      <td>Clear current data.</td>
+    </tr>
+    <tr><td>SaveAsURL</td>
+      <td>Display current modeling data as a URL. Data can be load by opening this URL with a browser.</td>
+    </tr>
+    <tr><td>Export</td>
+      <td>Export rendering result as PNG or AnimationGIF. Detail dialog will be open with this button.</td>
+    </tr>
+    <tr><td>Add</td>
+      <td>Add an object.</td>
+    </tr>
+    <tr><td>Dup</td>
+      <td>Duplicate current focused object.</td>
+    </tr>
+    <tr><td>Del</td>
+      <td>Delete current focused object.</td>
+    </tr>
+    <tr><td>Back</td>
+      <td>Move current focused object up</td>
+    </tr>
+    <tr><td>Fore</td>
+      <td>Move current focused object down.</td>
+    </tr>
+  </table>
+</div>
+
+<div class="doc_ja">
+<h2>ObjList</h2>
+<img src="images/objlist.png" style="float:left;margin:10px"/>
+<p>ここには使用している基本オブジェクトの一覧が表示されます。
+  1行だけ明るく表示されているのが現在フォーカスしているオブジェクトになり、各行をクリックする事で切り替える事ができます。
+  右側の Object parameter および Effects ペインには現在フォーカスされているオブジェクトの情報が表示されます。
+</p>
+<p>各行の左にあるチェックボックスはそれぞれのオブジェクトの表示/非表示を切り替えます。</p>
+<br clear="both"/>
+</div>
+<div class="doc_en">
+  <h2>ObjList</h2>
+  <img src="images/objlist.png" style="float:left;margin:10px"/>
+  <p>The list of object. The bright line indicate the current focused object.
+    focused object can be switched by clicking these line.
+    Object parameter and Effects pane right side will show current focused object parameters.
+  </p>
+  <p>Check-box on left side switches show/hide of each object.</p>
+  <br clear="both"/>
+</div>
+
+
+<div class="doc_ja">
+<h2>Object Param</h2>
+<img src="images/objparam.png" style="float:left;margin:10px"/>
+<p>各オブジェクトの形状や色をこれらのパラメータで指定します。</p>
+<table>
+  <tr><th>パラメータ</th><th>説明</th></tr>
+  <tr><td>Type</td><td>基本形状を指定します。"Cylinder" と "Cube" の2種類があります。
+    <table><tr><td><img src="images/cylinder.png"/></td><td><img src="images/cube.png"/></td></tr><tr><td>Cylinder</td><td>Cube</td></tr></table>
+  </td></tr>
+  <tr><td>Aspect</td><td>形状の(真上から見た時の)縦横比を設定します。
+    <table><tr><td><img src="images/aspect1.png"/></td><td><img src="images/cylinder.png"/></td><td><img src="images/aspect2.png"/></td></tr><tr><td>Aspect = -50</td><td>Aspect = 0</td><td>Aspect = 50</td></tr></table>
+  </td></tr>
+  <tr><td>Round</td><td>Cubeを真上から見た時の角を丸くします。このパラメータはCylinderでは無効です。
+    <table><tr><td><img src="images/cube.png"/></td><td><img src="images/round1.png"/></td></tr><tr><td>Round = 0</td><td>Round = 25</td></tr></table>
+  </td></tr>
+  <tr><td>WaveDepth<br/>WaveAngle</td><td>Cylinderを真上から見た時の周囲を波打たせます。WaveDepthは波の振幅、WaveAngleは波の頂点の数を表します。Cubeに対しても有効ですが、Roundパラメータで角を丸めた部分にのみ効果があります。
+    <table><tr><td><img src="images/wave.png"/></td></tr><tr><td>WaveDepth=20<br/>WaveAngle=5</td></tr></table>
+  </td></tr>
+  <tr><td>Deflate</td><td>形状の上面を底面よりも小さくします。Cylinderならば円錐、Cubeならば四角錐に近づいてゆきます。
+    <table><tr><td><img src="images/deflate1.png"/></td></tr><tr><td>Deflate=30</td></tr></table>
+  </td></tr>
+  <tr><td>Smooth</td><td>形状の上面を滑らかな曲面にします。
+    <table><tr><td><img src="images/smooth25.png"/></td><td><img src="images/smooth50.png"/></td><td><img src="images/smooth100.png"/></td></tr><tr><td>Smooth=25</td><td>Smooth=50</td><td>Smooth=100</td></tr></table>
+  </td></tr>
+  <tr><td>Height</td><td>形状の高さ方向のサイズを指定します。
+    <table><tr><td><img src="images/height10.png"/></td><td><img src="images/height20.png"/></td><td><img src="images/height50.png"/></td></tr><tr><td>Height=10</td><td>Height=20</td><td>Height=50</td></tr></table>
+  </td></tr>
+  <tr><td>Shininess</td><td>オブジェクトの光の反射の強さを指定します。
+    <table><tr><td><img src="images/shininess0.png"/></td><td><img src="images/shininess30.png"/></td><td><img src="images/shininess100.png"/></td></tr><tr><td>Shininess=0</td><td>Shininess=30</td><td>Shininess=100</td></tr></table>
+  </td></tr>
+  <tr><td>Texture<br/>TexType<br/>TexDepth<br/>TexZoom</td><td>これら4つのパラメータはオブジェクト表面のテクスチャーを指定します。
+    <ul>
+      <li>Textureは使用する模様のビットマップの指定です。</li>
+      <li>TexTypeはBumpの場合表面の凹凸として表現され、Normalの場合はビットマップがそのまま貼り付けられます。</li>
+      <li>TexDepthはBumpの強さを指定します。値がプラスの場合模様が浮き出る方向に、マイナスの場合には彫り込まれる方向に働きます。このパラメータはTexTypeがNormalの場合無効です。</li>
+      <li>TexZoomはテクスチャーの拡大率です。</li>
+    </ul>
+    <table><tr><td><img src="images/texsand100.png"/></td><td><img src="images/texfabric100.png"/></td><td><img src="images/texmosaic150.png"/></td></tr><tr><td>Texture=Sand<br/>TexType=Bump<br/>TexDepth=100<br/>TexZoom=100</td><td>Texture=Fabric<br/>TexType=Bump<br/>TexDepth=100<br/>TexZoom=100</td><td>Texture=Mosaic<br/>TexType=Bump<br/>TexDepth=-150<br/>TexZoom=120</td></tr></table>
+  </td></tr>
+  <tr><td>Color</td><td>HLSまたはRGBでオブジェクトの色を指定します。下部にはカラーパレットがあり、そこから選択する事もできます。カラーパレットをShift + クリックする事で現在の色をパレットに登録する事ができます。
+    <table><tr><td><img src="images/colr.png"/></td><td><img src="images/colg.png"/></td><td><img src="images/colb.png"/></td></tr></table>
+  </td></tr>
+</table>
+<br clear="both"/>
+</div>
+
+<div class="doc_en">
+  <h2>Object Param</h2>
+  <img src="images/objparam.png" style="float:left;margin:10px"/>
+  <p>The shapes or colors are determined by these parameters.</p>
+  <table>
+    <tr><th>Parameter</th><th>Description</th></tr>
+    <tr><td>Type</td><td>Specify the basic shape, "Cylinder" or "Cube".
+      <table><tr><td><img src="images/cylinder.png"/></td><td><img src="images/cube.png"/></td></tr><tr><td>Cylinder</td><td>Cube</td></tr></table>
+    </td></tr>
+    <tr><td>Aspect</td><td>Specify aspect ratio in X-Y plane (means from just above).
+      <table><tr><td><img src="images/aspect1.png"/></td><td><img src="images/cylinder.png"/></td><td><img src="images/aspect2.png"/></td></tr><tr><td>Aspect = -50</td><td>Aspect = 0</td><td>Aspect = 50</td></tr></table>
+    </td></tr>
+    <tr><td>Round</td><td>Round the corner (from just above) of Cube. This parameter is ignored in "Cylinder".
+      <table><tr><td><img src="images/cube.png"/></td><td><img src="images/round1.png"/></td></tr><tr><td>Round = 0</td><td>Round = 25</td></tr></table>
+    </td></tr>
+    <tr><td>WaveDepth<br/>WaveAngle</td><td>Waving effect of circumference of "Cylinder". WaveDepth is the amplitude of the wave, and WaveAngle is the number of peaks. This parameter also affect to "Cube" but only for "Rounded" corners.
+      <table><tr><td><img src="images/wave.png"/></td></tr><tr><td>WaveDepth=20<br/>WaveAngle=5</td></tr></table>
+    </td></tr>
+    <tr><td>Deflate</td><td>Deflate the top face of the shape. It will come close to cone shape or pyramid shape.
+      <table><tr><td><img src="images/deflate1.png"/></td></tr><tr><td>Deflate=30</td></tr></table>
+    </td></tr>
+    <tr><td>Smooth</td><td>Smoothen the top face.
+      <table><tr><td><img src="images/smooth25.png"/></td><td><img src="images/smooth50.png"/></td><td><img src="images/smooth100.png"/></td></tr><tr><td>Smooth=25</td><td>Smooth=50</td><td>Smooth=100</td></tr></table>
+    </td></tr>
+    <tr><td>Height</td><td>Specify the height of the object.
+      <table><tr><td><img src="images/height10.png"/></td><td><img src="images/height20.png"/></td><td><img src="images/height50.png"/></td></tr><tr><td>Height=10</td><td>Height=20</td><td>Height=50</td></tr></table>
+    </td></tr>
+    <tr><td>Shininess</td><td>Specify the reflection of the object.
+      <table><tr><td><img src="images/shininess0.png"/></td><td><img src="images/shininess30.png"/></td><td><img src="images/shininess100.png"/></td></tr><tr><td>Shininess=0</td><td>Shininess=30</td><td>Shininess=100</td></tr></table>
+    </td></tr>
+    <tr><td>Texture<br/>TexType<br/>TexDepth<br/>TexZoom</td><td>These four parameters specifies the surface texture of the object.
+      <ul>
+        <li>Texture is the bitmap pattern to use.</li>
+        <li>TexType, "Bump" means the representation as a unevenness of surface, "Normal" means directly use of bitmap as the surface.</li>
+        <li>TexDepth is the intensity of bumping of "Bump" type texture. It will be ignored in "Normal" type texture.</li>
+      </ul>
+      <li>TexZoom is the scaling factor of texture.</li>
+      <table><tr><td><img src="images/texsand100.png"/></td><td><img src="images/texfabric100.png"/></td><td><img src="images/texmosaic150.png"/></td></tr><tr><td>Texture=Sand<br/>TexType=Bump<br/>TexDepth=100<br/>TexZoom=100</td><td>Texture=Fabric<br/>TexType=Bump<br/>TexDepth=100<br/>TexZoom=100</td><td>Texture=Mosaic<br/>TexType=Bump<br/>TexDepth=-150<br/>TexZoom=120</td></tr></table>
+    </td></tr>
+    <tr><td>Color</td><td>Specify the object color using HLS or RGB. Color palete is also available. Use SHIFT+clicking to register color to palete.
+      <table><tr><td><img src="images/colr.png"/></td><td><img src="images/colg.png"/></td><td><img src="images/colb.png"/></td></tr></table>
+    </td></tr>
+  </table>
+  <br clear="both"/>
+</div>
+
+<div class="doc_ja">
+<h2>Effects</h2>
+<img src="images/effects.png" style="float:left;margin:10px"/>
+<p>これらのパラメータは基本のオブジェクトに対してさらに変更を加えるもので、フレームに対応してノブが回転するなどのアニメーションを作成する事ができます。
+  パラメータの多くは2つの値の組になっています。
+  デフォルトでは左側の値(From)のみが使用されますが、中央のドロップダウンメニューで"=&gt;"を選ぶと最初のフレームでは左の値、最後のフレームでは右の値が使用され、中間は自動的に補間されます。
+</p>
+<table>
+  <tr><th>パラメータ</th><th>説明</th></tr>
+  <tr>
+    <td>Zoom X / Y / XYSepa</td>
+    <td>オブジェクトのサイズを変更します。デフォルトではXの値のみが使用されますがXYSepaにチェックを入れるとX方向とY方向を独立してコントロールできます。<br/>
+      <img src="images/zoomxy.gif"/></td>
+  </tr>
+  <tr>
+    <td>Offset X / Y</td>
+    <td>X方向およびY方向それぞれのオブジェクトの位置を変更します。<br/>
+      <img src="images/offsetx.gif"/> <img src="images/offsety.gif"</td>
+    </td>
+  </tr>
+  <tr>
+    <td>RotateAt<br/>KeepDir<br/>CenterX<br/>CenterY<br/>Angle</td>
+    <td>オブジェクトを回転させます。CenterX / CenterY で回転の中心を指定し、Angleで回転の角度を指定します。KeepDirは未実装です。<br/>
+      <table><tr><td><img src="images/rotate.gif"/></td><td><img src="images/rotate2.gif"</td><td><img src="images/rotate3.gif"/></td></tr>
+        <tr><td>Angle -150=&gt;+150</td><td>OffsetYと組み合わせた例:<br/>Angle -150=&gt;+150<br/>OffsetY 40</td><td>OffsetX/YとCenterX/Yが同じ値の場合:<br/>OffsetX/Y 20/30<br/>CenterX/Y 20/30<br/>Angle -150=&gt;+150</td></tr></table></td>
+    </td>
+  </tr>
+  <tr>
+    <td>Alpha</td>
+    <td>オブジェクトの透明度を設定します。<br/>
+      <table><tr><td><img src="images/alpha.gif"/></td></tr>
+        <tr><td>Alpha 0=&gt;100</td></tr></table></td>
+    </td>
+  </tr>
+  <tr>
+    <td>Brightness</td>
+    <td>オブジェクトの明るさを設定します。マイナスの場合は黒に近づき、プラスの場合は白に近づきます。<br/>
+      <table><tr><td><img src="images/brightness.gif"/></td></tr>
+        <tr><td>Brightness -100=&gt;+100</td></tr></table></td>
+    </td>
+  </tr>
+  <tr>
+    <td>Hue</td>
+    <td>オブジェクトの色相を設定します。-360または+360で一周して元の色に戻ります。<br/>
+      <table><tr><td><img src="images/hue.gif"/></td></tr>
+        <tr><td>Hue 0=&gt;+360</td></tr></table></td>
+    </td>
+  </tr>
+</table>
+<br clear="both"/>
+</div>
+
+<div class="doc_en">
+<h2>Effects</h2>
+<img src="images/effects.png" style="float:left;margin:10px"/>
+<p>These parameters adding more effects to objects. It will makes animation frame by frame e.g. knob-rotation. Almost parameters are consist of pair of values. In default, the left side value will be used. And the value will be interporated between right side value according to frame when you select the '=&gt;' on dropdown.
+</p>
+<table>
+  <tr><th>Parameter</th><th>Description</th></tr>
+  <tr>
+    <td>Zoom X / Y / XYSepa</td>
+    <td>Scale the object size. The 'X' value is used for X and Y in default. X and Y value are independently controlled when checked the 'XYSepa' checkbox.<br/>
+      <img src="images/zoomxy.gif"/></td>
+  </tr>
+  <tr>
+    <td>Offset X / Y</td>
+    <td>Offset the object position along to the X-axis or Y-axis.<br/>
+      <img src="images/offsetx.gif"/> <img src="images/offsety.gif"</td>
+    </td>
+  </tr>
+  <tr>
+    <td>RotateAt<br/>KeepDir<br/>CenterX<br/>CenterY<br/>Angle</td>
+    <td>Rotate the object. CenterX / CenterY specifies the center of rotation, and the Angle specifies the rotation in degree. KeepDir is not yet implemented.<br/>
+      <table><tr><td><img src="images/rotate.gif"/></td><td><img src="images/rotate2.gif"</td><td><img src="images/rotate3.gif"/></td></tr>
+        <tr><td>Angle -150=&gt;+150</td><td>Combination with OffsetY:<br/>Angle -150=&gt;+150<br/>OffsetY 40</td><td>Setting same value to  OffsetX/Y and CenterX/Y:<br/>OffsetX/Y 20/30<br/>CenterX/Y 20/30<br/>Angle -150=&gt;+150</td></tr></table></td>
+    </td>
+  </tr>
+  <tr>
+    <td>Alpha</td>
+    <td>Specifies the transparency of the object.<br/>
+      <table><tr><td><img src="images/alpha.gif"/></td></tr>
+        <tr><td>Alpha 0=&gt;100</td></tr></table></td>
+    </td>
+  </tr>
+  <tr>
+    <td>Brightness</td>
+    <td>Specifies the brightness of the object color. Come close to black when negative value, and come close to white when positive value.<br/>
+      <table><tr><td><img src="images/brightness.gif"/></td></tr>
+        <tr><td>Brightness -100=&gt;+100</td></tr></table></td>
+    </td>
+  </tr>
+  <tr>
+    <td>Hue</td>
+    <td>Specifies the hue of the object color in degree. -360 or +360 means same color as original.<br/>
+      <table><tr><td><img src="images/hue.gif"/></td></tr>
+        <tr><td>Hue 0=&gt;+360</td></tr></table></td>
+    </td>
+  </tr>
+</table>
+<br clear="both"/>
+</div>
+
+
+<div class="doc_ja">
+<h2>Rendering</h2>
+<img src="images/rendering.png" style="float:left;margin:10px"/>
+<p>このペインにはレンダリングされた結果が表示されます。また、ライティング等の全体的な設定もここで行います。
+</p>
+<br clear="both"/>
+<table>
+  <tr><th>パラメータ/コマンド</th><th>説明</th></tr>
+  <tr><td>画像の右/下のスライダーおよび数値</td><td>カメラの位置を設定します。</td></tr>
+  <tr><td>Reset</td><td>カメラの位置を中央真上に設定します。</td></tr>
+  <tr><td>Ambient</td><td>周辺の明るさの設定です。0の場合はライトの当たっていない部分が完全に黒になります<br/>
+    <table>
+      <tr><td><img src="images/ambient0.png"/></td><td><img src="images/ambient50.png"></td></tr>
+      <tr><td>Ambient 0</td><td>Ambient 50</td></tr>
+    </table>
+    <tr><td>Intensity</td><td>一定の方向から当てるライトの強さです。<br/>
+      <table>
+        <tr><td><img src="images/intensity0.png"/></td><td><img src="images/intensity50.png"></td><td><img src="images/intensity100.png"/></td></tr>
+        <tr><td>Intensity 0</td><td>Intensity 50</td><td>Intensity 100</td></tr>
+      </table>
+  </td></tr>
+  <tr><td>Shadow</td><td>背景に落ちる影の強さです。0の場合はノブから背景に対して落ちる影が生成されません。なお、この影の処理を0以外の値にすると(特にFirefox/Edgeでは)かなり重くなります。<br/>
+    <table>
+      <tr><td><img src="images/shadow0.png"/></td><td><img src="images/shadow25.png"></td><td><img src="images/shadow50.png"/></td></tr>
+      <tr><td>Shadow 0</td><td>Shadow 25</td><td>Shadow 50</td></tr>
+    </table>
+  </td></tr>
+  <tr><td>LightDir</td><td>XY平面上で見たライトの方向です。<br/>
+    <table>
+    <tr><td><img src="images/lightdirm45.png"></td><td><img src="images/lightdirp45.png"/></td></tr>
+    <tr><td>LightDir -45</td><td>LightDir +45</td></tr>
+    </table>
+  </td></tr>
+  <tr><td>LightOffset</td><td>真上からLightDirで示す方向に向けてライトを傾ける角度です。0で真上、90で真横になります。<br/>
+    <table>
+    <tr><td><img src="images/lightoffset0.png"></td><td><img src="images/lightoffset45.png"/></td><td><img src="images/lightoffset90.png"/></td></tr>
+    <tr><td>LightOffset 0</td><td>LightOffset 45</td><td>LightOffset 90</td></tr>
+    </table>
+  </td></tr>
+  <tr><td>CamZoom</td><td>複数のオブジェクトで構成したシーン全体を拡大/縮小します。<br/>
+    <table>
+    <tr><td><img src="images/camzoom50.png"></td><td><img src="images/camzoom100.png"/></td><td><img src="images/camzoom150.png"/></td></tr>
+    <tr><td>CamZoom 50</td><td>CamZoom 100</td><td>CamZoom 150</td></tr>
+    </table>
+  </td></tr>
+  <tr><td>Frame / Animation</td><td>スライダーを移動するとEffectsの設定に従ってアニメーションされた各フレームを表示します。またAnimationボタンを押すと、自動的にアニメーションされます。<br/>
+    <table>
+    <tr><td><img src="images/frame.png"></td></tr>
+    </table>
+  </td></tr>
+</table>
+</div>
+
+<div class="doc_en">
+  <h2>Rendering</h2>
+  <img src="images/rendering.png" style="float:left;margin:10px"/>
+  <p>This pane diplay the rendering result. Also has parameters of global lighting etc.
+  </p>
+  <br clear="both"/>
+  <table>
+    <tr><th>Parameter / command</th><th>Description</th></tr>
+    <tr><td>The sliders and values right/bottom of the rendered image.</td><td>Specifies the camera potition.</td></tr>
+    <tr><td>Reset</td><td>Reset the camera position to just above.</td></tr>
+    <tr><td>Ambient</td><td>Ambient light intensity. If 0, the faces out of light direction will be complete black.<br/>
+      <table>
+        <tr><td><img src="images/ambient0.png"/></td><td><img src="images/ambient50.png"></td></tr>
+        <tr><td>Ambient 0</td><td>Ambient 50</td></tr>
+      </table>
+      <tr><td>Intensity</td><td>Directional light intensity.<br/>
+        <table>
+          <tr><td><img src="images/intensity0.png"/></td><td><img src="images/intensity50.png"></td><td><img src="images/intensity100.png"/></td></tr>
+          <tr><td>Intensity 0</td><td>Intensity 50</td><td>Intensity 100</td></tr>
+        </table>
+    </td></tr>
+    <tr><td>Shadow</td><td>Shadow density for background. If 0, The objects will not cast shadow to background plane. Note that this option will needs fairly CPU (especially in Firefox / Edge).<br/>
+      <table>
+        <tr><td><img src="images/shadow0.png"/></td><td><img src="images/shadow25.png"></td><td><img src="images/shadow50.png"/></td></tr>
+        <tr><td>Shadow 0</td><td>Shadow 25</td><td>Shadow 50</td></tr>
+      </table>
+    </td></tr>
+    <tr><td>LightDir</td><td>Light direction in X-Y plane.<br/>
+      <table>
+      <tr><td><img src="images/lightdirm45.png"></td><td><img src="images/lightdirp45.png"/></td></tr>
+      <tr><td>LightDir -45</td><td>LightDir +45</td></tr>
+      </table>
+    </td></tr>
+    <tr><td>LightOffset</td><td>Light direction from just above to LightDir direction. 0 means just above, and 90 means edge-on.<br/>
+      <table>
+      <tr><td><img src="images/lightoffset0.png"></td><td><img src="images/lightoffset45.png"/></td><td><img src="images/lightoffset90.png"/></td></tr>
+      <tr><td>LightOffset 0</td><td>LightOffset 45</td><td>LightOffset 90</td></tr>
+      </table>
+    </td></tr>
+    <tr><td>CamZoom</td><td>Scale the whole scene constructed with multiple objects.<br/>
+      <table>
+      <tr><td><img src="images/camzoom50.png"></td><td><img src="images/camzoom100.png"/></td><td><img src="images/camzoom150.png"/></td></tr>
+      <tr><td>CamZoom 50</td><td>CamZoom 100</td><td>CamZoom 150</td></tr>
+      </table>
+    </td></tr>
+    <tr><td>Frame / Animation</td><td>Display animated frames according to Effects parameters. The iamge will be automatically animated when the Animation button is pressed.
+      <br/>
+      <table>
+      <tr><td><img src="images/frame.png"></td></tr>
+      </table>
+    </td></tr>
+  </table>
+</div>
+
+<script>
+ShowDoc(GetLang());
+</script>
+</body>
+</html>

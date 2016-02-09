@@ -213,7 +213,7 @@ body{
   top:20px;
   left:150px;
   width:600px;
-  height:305px;
+  height:309px;
   color:#ccc;
   background:#666;
   border-radius:3px;
@@ -628,6 +628,30 @@ function ColorPicker(){
     +"<div style='position:absolute;top:88px;right:4px'>R : <input type='text' size='4' style='text-align:center' onchange='this.picker.SetRgb(event)'/></div>"
     +"<div style='position:absolute;top:110px;right:4px'>G : <input type='text' size='4' style='text-align:center' onchange='this.picker.SetRgb(event)'/></div>"
     +"<div style='position:absolute;top:132px;right:4px'>B : <input type='text' size='4' style='text-align:center' onchange='this.picker.SetRgb(event)'/></div>"
+    +"<button style='position:absolute;top:156px;left:4px;width:24px;height:20px;background:#000000' onclick='this.picker.SelPalete(event)' value='0'></button>"
+    +"<button style='position:absolute;top:156px;left:34px;width:24px;height:20px;background:#000080' onclick='this.picker.SelPalete(event)' value='0x80'></button>"
+    +"<button style='position:absolute;top:156px;left:64px;width:24px;height:20px;background:#008000' onclick='this.picker.SelPalete(event)' value='0x8000'></button>"
+    +"<button style='position:absolute;top:156px;left:94px;width:24px;height:20px;background:#008080' onclick='this.picker.SelPalete(event)' value='0x8080'></button>"
+    +"<button style='position:absolute;top:156px;left:124px;width:24px;height:20px;background:#800000' onclick='this.picker.SelPalete(event)' value='0x800000'></button>"
+    +"<button style='position:absolute;top:156px;left:154px;width:24px;height:20px;background:#800080' onclick='this.picker.SelPalete(event)' value='0x800080'></button>"
+    +"<button style='position:absolute;top:156px;left:184px;width:24px;height:20px;background:#808000' onclick='this.picker.SelPalete(event)' value='0x808000'></button>"
+    +"<button style='position:absolute;top:156px;left:214px;width:24px;height:20px;background:#808080' onclick='this.picker.SelPalete(event)' value='0x808080'></button>"
+    +"<button style='position:absolute;top:180px;left:4px;width:24px;height:20px;background:#c0c0c0' onclick='this.picker.SelPalete(event)' value='0xc0c0c0'></button>"
+    +"<button style='position:absolute;top:180px;left:34px;width:24px;height:20px;background:#0000ff' onclick='this.picker.SelPalete(event)' value='0xff'></button>"
+    +"<button style='position:absolute;top:180px;left:64px;width:24px;height:20px;background:#00ff00' onclick='this.picker.SelPalete(event)' value='0xff00'></button>"
+    +"<button style='position:absolute;top:180px;left:94px;width:24px;height:20px;background:#00ffff' onclick='this.picker.SelPalete(event)' value='0xffff'></button>"
+    +"<button style='position:absolute;top:180px;left:124px;width:24px;height:20px;background:#ff0000' onclick='this.picker.SelPalete(event)' value='0xff0000'></button>"
+    +"<button style='position:absolute;top:180px;left:154px;width:24px;height:20px;background:#ff00ff' onclick='this.picker.SelPalete(event)' value='0xff00ff'></button>"
+    +"<button style='position:absolute;top:180px;left:184px;width:24px;height:20px;background:#ffff00' onclick='this.picker.SelPalete(event)' value='0xffff00'></button>"
+    +"<button style='position:absolute;top:180px;left:214px;width:24px;height:20px;background:#ffffff' onclick='this.picker.SelPalete(event)' value='0xffffff'></button>"
+    +"<button style='position:absolute;top:204px;left:4px;width:24px;height:20px;background:#000000' onclick='this.picker.SelPalete(event)' value='0x0'></button>"
+    +"<button style='position:absolute;top:204px;left:34px;width:24px;height:20px;background:#000000' onclick='this.picker.SelPalete(event)' value='0x0'></button>"
+    +"<button style='position:absolute;top:204px;left:64px;width:24px;height:20px;background:#000000' onclick='this.picker.SelPalete(event)' value='0x0'></button>"
+    +"<button style='position:absolute;top:204px;left:94px;width:24px;height:20px;background:#000000' onclick='this.picker.SelPalete(event)' value='0x0'></button>"
+    +"<button style='position:absolute;top:204px;left:124px;width:24px;height:20px;background:#000000' onclick='this.picker.SelPalete(event)' value='0x0'></button>"
+    +"<button style='position:absolute;top:204px;left:154px;width:24px;height:20px;background:#000000' onclick='this.picker.SelPalete(event)' value='0x0'></button>"
+    +"<button style='position:absolute;top:204px;left:184px;width:24px;height:20px;background:#000000' onclick='this.picker.SelPalete(event)' value='0x0'></button>"
+    +"<button style='position:absolute;top:204px;left:214px;width:24px;height:20px;background:#000000' onclick='this.picker.SelPalete(event)' value='0x0'></button>"
     +"</div>";
   this.button=this.element.childNodes[0].childNodes[0];
   this.colormap=this.element.childNodes[0].childNodes[2];
@@ -638,6 +662,22 @@ function ColorPicker(){
   this.paramG=this.element.childNodes[0].childNodes[7].childNodes[1];
   this.paramB=this.element.childNodes[0].childNodes[8].childNodes[1];
   this.paramH.picker=this.paramL.picker=this.paramS.picker=this.paramR.picker=this.paramG.picker=this.paramB.picker=this;
+  this.pal=[];
+  for(var i=0;i<24;++i){
+    this.pal[i]=this.element.childNodes[0].childNodes[9+i];
+    this.pal[i].picker=this;
+  }
+  this.SelPalete=function(event){
+    if(event.shiftKey){
+      event.target.value=this.curColor.GetColor24();
+      event.target.style.background=this.curColor.GetColStr();
+    }
+    else{
+      this.SetCurColor(event.target.value);
+      if(this.callback)
+        this.callback(this.curColor);
+    }
+  }
   this.SetHls=function(e){
     this.curColor.SetHls(parseInt(this.paramH.value),parseInt(this.paramL.value),parseInt(this.paramS.value));
     this.UpdateCurColor();
@@ -1054,6 +1094,7 @@ function Effect(app,ly){
   this.angle1=this.angle2=0;
   this.angleanim=-1;
   this.centerx=this.centery=0;
+  this.keepdir=false;
   this.alpha1=this.alpha2=100;
   this.alphaanim=-1;
   this.brightness1=this.brightness2=0;
@@ -1273,6 +1314,18 @@ function Layer(app,n){
       this.eff.offsetyanim=v;
       this.eff.Apply(this.app.curRatio);
       break;
+    case "keepdir":
+      this.eff.keepdir=v;
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "centerx":
+      this.eff.centerx=parseFloat(v);
+      this.eff.Apply(this.app.curRatio);
+      break;
+    case "centery":
+      this.eff.centery=parseFloat(v);
+      this.eff.Apply(this.app.curRatio);
+      break;
     case "angle1":
       this.eff.angle1=parseFloat(v);
       this.eff.Apply(this.app.curRatio);
@@ -1283,14 +1336,6 @@ function Layer(app,n){
       break;
     case "angleanim":
       this.eff.angleanim=v;
-      this.eff.Apply(this.app.curRatio);
-      break;
-    case "centerx":
-      this.eff.centerx=parseFloat(v);
-      this.eff.Apply(this.app.curRatio);
-      break;
-    case "centery":
-      this.eff.centery=parseFloat(v);
       this.eff.Apply(this.app.curRatio);
       break;
     case "alpha1":
@@ -1373,9 +1418,9 @@ function Lighting(app){
   this.app=app;
   this.ambient=30;
   this.intensity=100;
-  this.shadowdensity=30;
+  this.shadow=30;
   this.lightdir = -45;
-  this.lightoffset = 20;
+  this.lightoffset = 45;
   this.light1 = new THREE.DirectionalLight(0xffffff,1);
 //  this.light1.position.set( -200, 200, 200 );
 //  var thd=this.lightdir*Math.PI/180;
@@ -1390,13 +1435,14 @@ function Lighting(app){
   app.scene.add(this.light0);
   document.getElementById("ambient").value=this.ambient;
   document.getElementById("intensity").value=this.intensity;
-  document.getElementById("shadowdensity").value=this.shadowdensity;
+  document.getElementById("shadow").value=this.shadow;
   document.getElementById("lightdir").value=this.lightdir;
   document.getElementById("lightoffset").value=this.lightoffset;
   this.SetLightPos=function(offd,offo){
     var thd=(this.lightdir+offd)*Math.PI/180;
     var tho=(this.lightoffset+offo)*Math.PI/180;
-    this.light1.position.set(Math.sin(thd)*Math.sin(tho)*200,Math.cos(thd)*Math.sin(tho)*200,Math.cos(tho)*200);
+//    this.light1.position.set(Math.sin(thd)*Math.sin(tho)*200,Math.cos(thd)*Math.sin(tho)*200,Math.cos(tho)*200);
+    this.light1.position.set(Math.sin(thd)*Math.sin(tho)*500,Math.cos(thd)*Math.sin(tho)*500,Math.cos(tho)*500);
   };
   this.Setup=function(n,v){
     switch(n){
@@ -1410,8 +1456,8 @@ function Lighting(app){
       this.light0.color.r=this.light0.color.g=this.light0.color.b=(v/100);
       this.app.Render();
       break;
-    case "shadowdensity":
-      this.shadowdensity=parseFloat(v);
+    case "shadow":
+      this.shadow=parseFloat(v);
       this.app.Render();
       break;
     case "lightdir":
@@ -1433,7 +1479,7 @@ function KnobData(ap) {
   Def(this,"camy",ap.camy,null);
   Def(this,"ambient",ap.lighting.ambient,30);
   Def(this,"intensity",ap.lighting.intensity,100);
-  Def(this,"shadowdensity",ap.lighting.shadowdensity,30);
+  Def(this,"shadow",ap.lighting.shadow,30);
   Def(this,"lightdir",ap.lighting.lightdir,-45);
   Def(this,"lightoffset",ap.lighting.lightoffset,45);
   Def(this,"camzoom",ap.camzoom,100);
@@ -1574,6 +1620,14 @@ function App() {
   this.layer[1]=new Layer(this,1);
   this.layer[2]=new Layer(this,2);
   this.Render=function(){
+    if(this.lighting.shadow==0){
+      this.renderctx.globalAlpha=1;
+      this.renderctx.clearRect(0,0,256,256);
+      this.background.mesh.visible=false;
+      this.renderer.render(this.scene,this.camera);
+      this.renderctx.drawImage(this.renderer.domElement,0,0);
+      return;
+    }
     var cv1=document.getElementById("cvwork1");
     var ctx1=cv1.getContext("2d");
     this.background.mesh.visible=true;
@@ -1599,7 +1653,7 @@ function App() {
     ctx1.putImageData(imgd1,0,0);
     this.renderctx.clearRect(0,0,256,256);
     var n=0;
-    var d=this.lighting.shadowdensity*0.01;
+    var d=this.lighting.shadow*0.01;
     for(yy=-5;yy<=5;++yy){
       for(xx=-5;xx<=5;++xx){
         var r=d/++n;
@@ -1607,21 +1661,10 @@ function App() {
         this.renderctx.drawImage(cv1,xx,yy);
       }
     }
-    this.renderctx.globalAlpha=1;
     this.background.mesh.visible=false;
     this.renderer.render(this.scene,this.camera);
+    this.renderctx.globalAlpha=1;
     this.renderctx.drawImage(this.renderer.domElement,0,0);
-/*    var n=0;
-    for(var xx=-2;xx<=2;xx+=2){
-      for(var yy=-2;yy<=2;yy+=2){
-        var r=1.0/++n;
-        this.lighting.SetLightPos(xx,yy);
-        this.renderer.render(this.scene, this.camera);
-        this.renderctx.globalAlpha=r;
-        this.renderctx.drawImage(this.renderer.domElement,0,0);
-      }
-    }
-*/
   };
   this.SetupCam=function(){
     this.camxx=this.camx/180*Math.PI;
@@ -1648,7 +1691,7 @@ function App() {
     Set(app,"camy",k.camy,"camy","v");
     Set(app,"ambient",k.ambient,"ambient","v");
     Set(app,"intensity",k.intensity,"intensity","v");
-    Set(app,"shadowdensity",k.shadowdensity,"shadowdensity","v");
+    Set(app,"shadow",k.shadow,"shadow","v");
     Set(app,"camzoom",k.camzoom,"camzoom","v");
     Set(app,"exporttype",k.type,"exporttype","v");
     Set(app,"exportwidth",k.width,"exportwidth","v");
@@ -1851,7 +1894,7 @@ function App() {
       this.exportshuttle=v;
     case "ambient":
     case "intensity":
-    case "shadowdensity":
+    case "shadow":
     case "lightdir":
     case "lightoffset":
       this.lighting.Setup(n,v);
@@ -1939,6 +1982,7 @@ function App() {
     document.getElementById("height").value=p.height;
     document.getElementById("shininess").value=p.shininess;
     document.getElementById("texture").value=p.texture;
+    document.getElementById("textype").value=p.textype;
     document.getElementById("texdepth").value=p.texdepth;
     document.getElementById("texzoom").value=p.texzoom;
     this.colorPicker.SetCurColor(p.color);
@@ -1955,7 +1999,7 @@ function App() {
     document.getElementById("offsety1").value=e.offsety1;
     document.getElementById("offsety2").value=e.offsety2;
     document.getElementById("offsetyanim").value=e.offsetyanim;
-    document.getElementById("keepdir").value=e.keepdir;
+    document.getElementById("keepdir").checked=e.keepdir;
     document.getElementById("centerx").value=e.centerx;
     document.getElementById("centery").value=e.centery;
     document.getElementById("angle1").value=e.angle1;
@@ -2011,8 +2055,8 @@ function App() {
   this.SelLayer(0);
   this.SetupCam();
   this.Layout=function(){
-    document.getElementById("lybase").style.height=(window.innerHeight-115)+"px";
-    document.getElementById("lypane").style.height=(window.innerHeight-145)+"px";
+    document.getElementById("lybase").style.height=(window.innerHeight-111)+"px";
+    document.getElementById("lypane").style.height=(window.innerHeight-141)+"px";
     document.getElementById("primbase").style.height=(window.innerHeight-427)+"px";
     document.getElementById("primpane").style.height=(window.innerHeight-457)+"px";
     document.getElementById("effbase").style.height=(window.innerHeight-427)+"px";
@@ -2306,6 +2350,9 @@ window.addEventListener("DOMContentLoaded", Init, false);
     <button onclick="app.BackLayer()">Back</button>
     <button onclick="app.ForeLayer()">Fore</button>
   </span>
+  <span> Etc :
+    <button onclick="window.open('help.html')">Help</button>
+  </span>
 </div>
 <div id="lybase">
   <div class="panetitle">-- ObjList --</div>
@@ -2381,10 +2428,10 @@ window.addEventListener("DOMContentLoaded", Init, false);
   <canvas id="render" width="256" height="256"></canvas>
 </div>
 <input id="camysli" type="range" min="-90" max="90" value="-30" oninput="app.Setup('camy',this.value)" style="position:absolute;top:175px;left:220px;display:block;width:120px;transform:rotate(-90deg)"/>
-<input id="camxsli" type="range" min="-90" max="90" value="0" oninput="app.Setup('camx',this.value)" style="position:absolute;top:280px;left:120px;display:block;width:120px"/>
+<input id="camxsli" type="range" min="-90" max="90" value="0" oninput="app.Setup('camx',this.value)" style="position:absolute;top:284px;left:120px;display:block;width:120px"/>
 <input id="camy" type="text" size="3" value="-30" oninput="app.Setup('camy',this.value)" style="text-align:center;position:absolute;width:30px;left:265px;top:255px"/>
-<input id="camx" type="text" size="3" value="0" oninput="app.Setup('camx',this.value)" style="text-align:center;position:absolute;width:30px;left:265px;top:280px"/>
-<button onclick="app.Setup('camx',0);app.Setup('camy',0)" style="position:absolute;left:60px;top:280px">Reset</button>
+<input id="camx" type="text" size="3" value="0" oninput="app.Setup('camx',this.value)" style="text-align:center;position:absolute;width:30px;left:265px;top:284px"/>
+<button onclick="app.Setup('camx',0);app.Setup('camy',0)" style="position:absolute;left:60px;top:284px">Reset</button>
 <div id="prevpane2">
   <div class="effrow">-- Lighting --</div>
   <div class="effrow">
@@ -2397,7 +2444,7 @@ window.addEventListener("DOMContentLoaded", Init, false);
   </div>
   <div class="effrow">
     <div class="efflabel">Shadow:</div>
-    <input id="shadowdensity" type="text" value="0" size="6" oninput="app.lighting.Setup('shadowdensity',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'shadowdensity',0,100)"></button>
+    <input id="shadow" type="text" value="0" size="6" oninput="app.lighting.Setup('shadow',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'shadow',0,100)"></button>
   </div>
   <div class="effrow">
     <div class="efflabel">LightDir:</div>
@@ -2542,6 +2589,7 @@ window.addEventListener("DOMContentLoaded", Init, false);
 </div>
 
 <canvas id="cvwork1" width="256" height="256" style="display:none"></canvas>
+<canvas id="cvwork2" width="256" height="256" style="display:none"></canvas>
 
 </body>
 </html>

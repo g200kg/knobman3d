@@ -19,8 +19,8 @@ KnobMan3D is a Knob Image (film-strip) design tool based on WebGL + THREE.js
 ![](samples/simple.png) ![](samples/waveknob.png) ![](samples/knurling.png) ![](samples/led.png) ![](samples/objects.png)
 
 
-Available at :
-  [http://g200kg.github.io/knobman3d/](http://g200kg.github.io/knobman3d/)
+### Available at :  [http://g200kg.github.io/knobman3d/](http://g200kg.github.io/knobman3d/)
+### Online help is also available :  [Online Help](http://g200kg.github.io/knobman3d/help.html)
 
 ## License
  Copyright (c) 2016 g200kg http://www.g200kg.com/  
