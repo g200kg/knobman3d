@@ -1788,6 +1788,8 @@ function App() {
     }
   };
   this.Export=function(){
+    var s=document.getElementById("exportpane");
+    s.style.display="block";
     this.exportexec=this.ExportExec();
     this.ExportLoop();
   };
