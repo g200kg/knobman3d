@@ -79,6 +79,35 @@ body{
   color:white;
   width:80px;
 }
+#loadpane{
+  display:none;
+  position:absolute;
+  top:0px;
+  left:0px;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+}
+#loadframe{
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0;
+  color:#ccc;
+  background:#444;
+  width:95%;
+  height:200px;
+  margin:auto;
+  border:1px solid #888;
+  border-radius:3px;
+  box-shadow:1px 1px 2px 2px rgba(0,0,0,0.4);
+  padding-top:10px;
+}
+#loadurl{
+  width:90%;
+}
+
 #savepane{
   display:none;
   position:absolute;
@@ -345,7 +374,6 @@ body{
 <script src="GIFEncoder.js"></script>
 <script>
 var app;
-var layermax=16;
 var initload;
 
 function Col(r, g, b) {
@@ -690,19 +718,6 @@ function ColorPicker(){
     if(this.callback)
       this.callback(this.curColor);
   }
-/*  this.colormap=document.createElement("canvas");
-  this.colormap.setAttribute("width",120+32);
-  this.colormap.setAttribute("height",120);
-  this.button=document.createElement("button");
-  this.button.innerHTML="#808080";
-  this.element.appendChild(document.createTextNode("Color : "));
-  this.element.appendChild(this.button);
-  this.element.appendChild(document.createElement("br"));
-  this.element.appendChild(this.colormap);
-  this.values=document.createElement("div");
-  this.element.appendChild(this.values);
-  this.values.innerHTML="H: <input type='text' size='4' style='position:absolute;top:0;right:0'/> L: <input type='text' size='4'/> S: <input type='text' size='4'/>";
-*/
   this.colormap.picker=this;
   this.ctxColorMap=this.colormap.getContext("2d");
   this.imgColorMap=this.ctxColorMap.getImageData(0, 0, 120, 120);
@@ -764,42 +779,45 @@ function ColorPicker(){
       this.callback(this.curColor);
   };
   this.GetPos=function(e){
-    var rc = e.target.getBoundingClientRect();
-    return {x:Math.floor(e.clientX - rc.left), y:Math.floor(e.clientY - rc.top)};
+    var rc = this.colormap.getBoundingClientRect();
+    return {x:Math.max(0,Math.floor(e.clientX - rc.left)), y:Math.max(0,Math.floor(e.clientY - rc.top))};
   };
-  this.colormap.onmousedown=function(e){
-    var pos=this.picker.GetPos(e);
-    if(pos.x>=120){
-      this.picker.dragmode=2;
-      this.picker.SetBar(pos);
-    }
-    else{
-      this.picker.dragmode=1;
-      this.picker.SetMap(pos);
-    }
-    e.preventDefault();
-  };
-  this.colormap.onmousemove=function(e){
-    if(this.picker.dragmode){
-      if(e.buttons==0)
-        this.picker.dragmode=0;
-      var pos=this.picker.GetPos(e);
-      switch(this.picker.dragmode){
-      case 1:
-        this.picker.SetMap(pos);
-        break;
-      case 2:
-        this.picker.SetBar(pos);
-        break;
+  this.MouseDown=function(e){
+    if(e.target==this.colormap){
+      var pos=this.GetPos(e);
+      if(pos.x>=120){
+        this.dragmode=2;
+        this.SetBar(pos);
+      }
+      else{
+        this.dragmode=1;
+        this.SetMap(pos);
       }
     }
-    e.preventDefault();
   };
-  this.colormap.onmouseup=function(e){
-    this.picker.dragmode=0;
+  this.MouseMove=function(e){
+    if(this.dragmode){
+      if(e.buttons==0)
+        this.dragmode=0;
+      var pos=this.GetPos(e);
+      switch(this.dragmode){
+      case 1:
+        this.SetMap(pos);
+        break;
+      case 2:
+        this.SetBar(pos);
+        break;
+      }
+      e.preventDefault();
+    }
+//    e.preventDefault();
   };
-  this.colormap.onmouseout=function(e){
-  }
+  this.MouseUp=function(e){
+    this.dragmode=0;
+  };
+  window.addEventListener("mousedown",this.MouseDown.bind(this));
+  window.addEventListener("mousemove",this.MouseMove.bind(this));
+  window.addEventListener("mouseup",this.MouseUp.bind(this));
 }
 function Primitive(app,ly){
   this.app=app;
@@ -1170,7 +1188,7 @@ function Layer(app,n){
     switch(n){
     case "visible":
       this.visible=v;
-      this.prim.mesh.visible=this.visible&&this.prim.type!="none";
+      this.prim.mesh.visible=this.visible&&(this.prim.type!="none");
 //      this.prim.MeshSetup();
       break;
     case "color":
@@ -1181,7 +1199,7 @@ function Layer(app,n){
       break;
     case "type":
       this.prim.type=v;
-      this.prim.mesh.visible=this.visible&&this.prim.type!="none";
+      this.prim.mesh.visible=this.visible&&(this.prim.type!="none");
 //      this.prim.Rebuild();
       this.prim.MeshSetup();
       this.prim.geometry.uvsNeedUpdate=true;
@@ -1340,9 +1358,13 @@ function Layer(app,n){
       break;
     case "alpha1":
       this.eff.alpha1=parseFloat(v);
+//      this.prim.material.opacity=this.eff.alpha1/100;
+//      this.prim.material.needsUpdate=true;
+
       this.prim.Rebuild();
       this.prim.MeshSetup();
       this.eff.Apply(this.app.curRatio);
+      this.prim.MatSetup();
       break;
     case "alpha2":
       this.eff.alpha2=parseFloat(v);
@@ -1546,7 +1568,7 @@ function App() {
   this.colorPicker.callback=function(c){
     app.Setup("color",c);
   };
-  this.maxlayer=16;
+  this.maxlayer=32;
   this.lypane=document.getElementById("lypane");
   this.primpane=document.getElementById("primpane");
   this.effpane=document.getElementById("effpane");
@@ -1675,6 +1697,18 @@ function App() {
     this.camera.updateProjectionMatrix();
   };
   this.LoadExec=function(kd){
+    var b64;
+    var i=kd.indexOf("?d=");
+    if(i>=0)
+      b64=kd.substr(i+3);
+    else if(kd.indexOf("d=")==0)
+      b64=kd.substr(2);
+    else
+      b64=kd;
+    var b64=b64+"===".substr(0,(4-b64.length)&3);
+    b64=b64.replace(/-/g,"+");
+    b64=b64.replace(/_/g,"/");
+    kd=atob(b64);
     function Set(o,n,v,e,t){
       if(typeof(v)!="undefined"){
         o[n]=v;
@@ -1687,6 +1721,7 @@ function App() {
     if(!kd)
       return;
     var k=JSON.parse(kd);
+    this.New(false);
     Set(app,"camx",k.camx,"camx","v");
     Set(app,"camy",k.camy,"camy","v");
     Set(app,"ambient",k.ambient,"ambient","v");
@@ -1747,8 +1782,13 @@ function App() {
       p.prim.MeshSetup();
       p.eff.Apply(0);
     }
-    for(;i<app.maxlayer;++i)
+    for(;i<app.maxlayer;++i){
+      if(app.layer[i]){
+        app.layer[i].Setup("type","none");
+        app.layer[i].prim.Rebuild();
+      }
       app.layer[i]=null;
+    }
     app.SetupCam();
     app.SelLayer(0);
     app.UpdateLayerPane();
@@ -1765,10 +1805,27 @@ function App() {
     if(ref.indexOf("?")>=0)
       ref=ref.substr(0,ref.indexOf("?"));
     var s=JSON.stringify(d);
-    s=ref+"?d="+btoa(s);
+    var b64=btoa(s);
+    b64=b64.replace(/=/g,"");
+    b64=b64.replace(/\+/g,"-");
+    b64=b64.replace(/\//g,"_");
+    s=ref+"?d="+b64;
     document.getElementById("savepane").style.display="block";
     document.getElementById("saveurl").value=s;
-  }
+  };
+  this.CloseSave=function(){
+    document.getElementById("savepane").style.display="none";
+  };
+  this.Load=function(){
+    document.getElementById("loadpane").style.display="block";
+  };
+  this.CancelLoad=function(){
+    document.getElementById("loadpane").style.display="none";
+  };
+  this.OkLoad=function(){
+    this.LoadExec(document.getElementById("loadurl").value);
+    document.getElementById("loadpane").style.display="none";
+  };
   this.Download=function(){
     var s,a;
     if(this.exporttype=="gifanim"){
@@ -1802,6 +1859,12 @@ function App() {
     this.Layout();
     var enc;
     var cvwork=document.getElementById("exportcanvas");
+    var cvworkh=document.getElementById("cvworkh");
+    var ctxh=cvworkh.getContext("2d");
+    var cvworkq=document.getElementById("cvworkq");
+    var ctxq=cvworkq.getContext("2d");
+    var cvworko=document.getElementById("cvworko");
+    var ctxo=cvworko.getContext("2d");
     switch(this.exporttype){
     case "vert":
       cvwork.width=this.exportwidth;
@@ -1824,6 +1887,7 @@ function App() {
     var s=document.getElementById("exportpane");
     s.style.display="block";
     var ctx=cvwork.getContext("2d");
+    var srccv;
     for(var i=0;i<this.exportframes;++i){
       var r;
       if(this.exportframes<2)
@@ -1834,18 +1898,36 @@ function App() {
         this.layer[j].eff.Apply(r);
       }
       this.Render();
+      srccv=this.rendercv;
+      if(this.exporthqresize){
+        if(this.exportwidth*2<srccv.width){
+          ctxh.clearRect(0,0,128,128);
+          ctxh.drawImage(this.rendercv,0,0,128,128);
+          srccv=cvworkh;
+        }
+        if(this.exportwidth*2<srccv.width){
+          ctxq.clearRect(0,0,64,64);
+          ctxq.drawImage(this.rendercv,0,0,64,64);
+          srccv=cvworkq;
+        }
+        if(this.exportwidth*2<srccv.width){
+          ctxo.clearRect(0,0,32,32);
+          ctxo.drawImage(this.rendercv,0,0,32,32);
+          srccv=cvworko;
+        }
+      }
       switch(this.exporttype){
       case "horz":
-        ctx.drawImage(this.rendercv,i*this.exportwidth,0,this.exportwidth,this.exportheight);
+        ctx.drawImage(srccv,i*this.exportwidth,0,this.exportwidth,this.exportheight);
         break;
       case "vert":
-        ctx.drawImage(this.rendercv,0,i*this.exportheight,this.exportwidth,this.exportheight);
+        ctx.drawImage(srccv,0,i*this.exportheight,this.exportwidth,this.exportheight);
         break;
       case "gifanim":
         ctx.fillStyle="#ffffff";
         ctx.fillRect(0,0,this.exportwidth,this.exportheight);
 //        ctx.clearRect(0,0,this.exportwidth,this.exportheight);
-        ctx.drawImage(this.rendercv,0,0,this.exportwidth,this.exportheight);
+        ctx.drawImage(srccv,0,0,this.exportwidth,this.exportheight);
         enc.addFrame(ctx);
         break;
       }
@@ -1862,9 +1944,27 @@ function App() {
           for(var j=0;this.layer[j];++j)
             this.layer[j].eff.Apply(r);
           this.Render();
+          srccv=this.rendercv;
+          if(this.exporthqresize){
+            if(this.exportwidth*2<srccv.width){
+              ctxh.clearRect(0,0,128,128);
+              ctxh.drawImage(this.rendercv,0,0,128,128);
+              srccv=cvworkh;
+            }
+            if(this.exportwidth*2<srccv.width){
+              ctxq.clearRect(0,0,64,64);
+              ctxq.drawImage(this.rendercv,0,0,64,64);
+              srccv=cvworkq;
+            }
+            if(this.exportwidth*2<srccv.width){
+              ctxo.clearRect(0,0,32,32);
+              ctxo.drawImage(this.rendercv,0,0,32,32);
+              srccv=cvworko;
+            }
+          }
           ctx.fillStyle="#ffffff";
           ctx.fillRect(0,0,this.exportwidth,this.exportheight);
-          ctx.drawImage(this.rendercv,0,0,this.exportwidth,this.exportheight);
+          ctx.drawImage(srccv,0,0,this.exportwidth,this.exportheight);
           enc.addFrame(ctx);
         }
       }
@@ -1894,6 +1994,10 @@ function App() {
       break;
     case "exportshuttle":
       this.exportshuttle=v;
+      break;
+    case "exporthqresize":
+      this.exporthqresize=v;
+      break;
     case "ambient":
     case "intensity":
     case "shadow":
@@ -1960,7 +2064,7 @@ function App() {
   }
   this.SelLayer=function(n){
     this.curLayer=n;
-    for(var i=0;i<layermax;++i){
+    for(var i=0;i<this.maxlayer;++i){
       var ly=document.getElementById("layer"+i);
       if(i==n+1){
         ly.style.background="#aaa";
@@ -2102,9 +2206,6 @@ function App() {
   }
   this.CloseExport=function(){
     document.getElementById("exportpane").style.display="none";
-  }
-  this.CloseSave=function(){
-    document.getElementById("savepane").style.display="none";
   }
   this.Animate=function(){
       app.curRatio+=app.animatedir*0.01;
@@ -2265,21 +2366,27 @@ function App() {
     l2.eff.Apply(app.curRatio);
     app.SelLayer(app.curLayer);
   };
-  this.New=function(){
-    app.Confirm("Not Saved. OK?",
-      function(){
-        for(var i=0;i<app.maxlayer;++i){
-          if(app.layer[i])
-            app.layer[i].Setup("type","none");
-          app.layer[i]=null;
+  this.New=function(confirm){
+    function exec(){
+      for(var i=0;i<app.maxlayer;++i){
+        if(app.layer[i]){
+          app.layer[i].Setup("type","none");
+          app.layer[i].prim.Rebuild();
         }
-        for(var i=0;i<3;++i)
-          app.layer[i]=new Layer(app,i);
-        app.SelLayer(0);
-        app.UpdateLayerPane();
-        app.Render();
-        app.DlgClose();
-      },
+        app.layer[i]=null;
+      }
+      for(var i=0;i<3;++i)
+        app.layer[i]=new Layer(app,i);
+      app.SelLayer(0);
+      app.UpdateLayerPane();
+      app.Render();
+      app.DlgClose();
+    }
+    if(!confirm){
+      exec();
+      return;
+    }
+    app.Confirm("Not Saved. OK?",exec,
       function(){
         app.DlgClose();
       });
@@ -2291,7 +2398,7 @@ function Init(){
   var s=location.search.substr(1).split("&");
   for(var i=0;i<s.length;++i){
     if(s[i].indexOf("d=")==0){
-      initload=atob(s[i].substr(2));
+      initload=s[i];
       return;
     }
   }
@@ -2340,8 +2447,8 @@ window.addEventListener("DOMContentLoaded", Init, false);
 <div id="main">
 <div id="menupane">
   <span>File :
-    <button onclick="app.New()">New</button>
-<!--    <button onclick="app.Load()">Load</button>-->
+    <button onclick="app.New(true)">New</button>
+    <button onclick="app.Load()">Load</button>
     <button onclick="app.Save()">SaveAsURL</button>
     <button onclick="app.Export()">Export</button>
   </span>
@@ -2357,7 +2464,7 @@ window.addEventListener("DOMContentLoaded", Init, false);
   </span>
 </div>
 <div id="lybase">
-  <div class="panetitle">-- ObjList --</div>
+  <div class="panetitle">-- Object List --</div>
   <div id="lypane">
     <div class="lyrow" id="layer0" style="padding-left:25px" onclick="app.SelLayer(-1)">Preference</div>
     <div class="lyrow" id="layer1" onclick="app.SelLayer(0)" style="display:block"><input type="checkbox" id="lv1" onchange="app.SetVisible(0,this.checked)" checked/><img id="icon1" src="./images/none.svg" /> <span id="lyname1">Obj1</span></div>
@@ -2376,6 +2483,22 @@ window.addEventListener("DOMContentLoaded", Init, false);
     <div class="lyrow" id="layer14" onclick="app.SelLayer(13)"><input type="checkbox" id="lv14" onchange="app.SetVisible(13,this.checked)" checked/><img id="icon14" src="./images/none.png" /> <span id="lyname14">Obj14</span></div>
     <div class="lyrow" id="layer15" onclick="app.SelLayer(14)"><input type="checkbox" id="lv15" onchange="app.SetVisible(14,this.checked)" checked/><img id="icon15" src="./images/none.png" /> <span id="lyname15">Obj15</span></div>
     <div class="lyrow" id="layer16" onclick="app.SelLayer(15)"><input type="checkbox" id="lv16" onchange="app.SetVisible(15,this.checked)" checked/><img id="icon16" src="./images/none.png" /> <span id="lyname16">Obj16</span></div>
+    <div class="lyrow" id="layer17" onclick="app.SelLayer(16)"><input type="checkbox" id="lv17" onchange="app.SetVisible(16,this.checked)" checked/><img id="icon17" src="./images/none.png" /> <span id="lyname17">Obj17</span></div>
+    <div class="lyrow" id="layer18" onclick="app.SelLayer(17)"><input type="checkbox" id="lv18" onchange="app.SetVisible(17,this.checked)" checked/><img id="icon18" src="./images/none.png" /> <span id="lyname18">Obj18</span></div>
+    <div class="lyrow" id="layer19" onclick="app.SelLayer(18)"><input type="checkbox" id="lv19" onchange="app.SetVisible(18,this.checked)" checked/><img id="icon19" src="./images/none.png" /> <span id="lyname19">Obj19</span></div>
+    <div class="lyrow" id="layer20" onclick="app.SelLayer(19)"><input type="checkbox" id="lv20" onchange="app.SetVisible(19,this.checked)" checked/><img id="icon20" src="./images/none.png" /> <span id="lyname20">Obj20</span></div>
+    <div class="lyrow" id="layer21" onclick="app.SelLayer(20)"><input type="checkbox" id="lv21" onchange="app.SetVisible(20,this.checked)" checked/><img id="icon21" src="./images/none.png" /> <span id="lyname21">Obj21</span></div>
+    <div class="lyrow" id="layer22" onclick="app.SelLayer(21)"><input type="checkbox" id="lv22" onchange="app.SetVisible(21,this.checked)" checked/><img id="icon22" src="./images/none.png" /> <span id="lyname22">Obj22</span></div>
+    <div class="lyrow" id="layer23" onclick="app.SelLayer(22)"><input type="checkbox" id="lv23" onchange="app.SetVisible(22,this.checked)" checked/><img id="icon23" src="./images/none.png" /> <span id="lyname23">Obj23</span></div>
+    <div class="lyrow" id="layer24" onclick="app.SelLayer(23)"><input type="checkbox" id="lv24" onchange="app.SetVisible(23,this.checked)" checked/><img id="icon24" src="./images/none.png" /> <span id="lyname24">Obj24</span></div>
+    <div class="lyrow" id="layer25" onclick="app.SelLayer(24)"><input type="checkbox" id="lv25" onchange="app.SetVisible(24,this.checked)" checked/><img id="icon25" src="./images/none.png" /> <span id="lyname25">Obj25</span></div>
+    <div class="lyrow" id="layer26" onclick="app.SelLayer(25)"><input type="checkbox" id="lv26" onchange="app.SetVisible(25,this.checked)" checked/><img id="icon26" src="./images/none.png" /> <span id="lyname26">Obj26</span></div>
+    <div class="lyrow" id="layer27" onclick="app.SelLayer(26)"><input type="checkbox" id="lv27" onchange="app.SetVisible(26,this.checked)" checked/><img id="icon27" src="./images/none.png" /> <span id="lyname27">Obj27</span></div>
+    <div class="lyrow" id="layer28" onclick="app.SelLayer(27)"><input type="checkbox" id="lv28" onchange="app.SetVisible(27,this.checked)" checked/><img id="icon28" src="./images/none.png" /> <span id="lyname28">Obj28</span></div>
+    <div class="lyrow" id="layer29" onclick="app.SelLayer(28)"><input type="checkbox" id="lv29" onchange="app.SetVisible(28,this.checked)" checked/><img id="icon29" src="./images/none.png" /> <span id="lyname29">Obj29</span></div>
+    <div class="lyrow" id="layer30" onclick="app.SelLayer(29)"><input type="checkbox" id="lv30" onchange="app.SetVisible(29,this.checked)" checked/><img id="icon30" src="./images/none.png" /> <span id="lyname30">Obj30</span></div>
+    <div class="lyrow" id="layer31" onclick="app.SelLayer(30)"><input type="checkbox" id="lv31" onchange="app.SetVisible(30,this.checked)" checked/><img id="icon31" src="./images/none.png" /> <span id="lyname31">Obj31</span></div>
+    <div class="lyrow" id="layer32" onclick="app.SelLayer(31)"><input type="checkbox" id="lv32" onchange="app.SetVisible(31,this.checked)" checked/><img id="icon32" src="./images/none.png" /> <span id="lyname32">Obj32</span></div>
   </div>
 </div>
 <div id="primbase">
@@ -2569,6 +2692,7 @@ window.addEventListener("DOMContentLoaded", Init, false);
       <div class="exprow"><div class="explabel">height:</div><input id="exportheight" type="text" size="3" onchange="app.Setup('exportheight',this.value)"/></div>
       <div class="exprow"><div class="explabel">frames:</div><input id="exportframes" type="text" size="3" onchange="app.Setup('exportframes',this.value)"/></div>
       <div class="exprow"><div class="explabel">Shuttle(for animation):</div><input id="exportshuttle" type="checkbox" onchange="app.Setup('exportshuttle',this.checked)"/></div>
+      <div class="exprow"><div class="explabel">HQ resize:</div><input id="exporthqresize" type="checkbox" onchange="app.Setup('exporthqresize',this.checked)"/></div>
       <button onclick="app.Export()">Apply</button>
       <button onclick="app.Download()">Download</button>
       <button onclick="app.CloseExport()">Close</button>
@@ -2583,6 +2707,15 @@ window.addEventListener("DOMContentLoaded", Init, false);
   </div>
 </div>
 
+<div id="loadpane">
+  <div id="loadframe" style="padding-left:3%">
+<!--    <p>Paste URL-Data here, or select file : <input type="file"/> <br/>-->
+    <p>Paste URL-Data here :<br/>
+    <textarea id="loadurl" rows="10" cols="40"></textarea><br/>
+    <button id="cancelload" onclick="app.CancelLoad()">Cancel</button> <button id="okload" onclick="app.OkLoad()">Ok</button>
+  </div>
+</div>
+
 <div id="dlgpane">
   <div id="dlgframe">
     <div id="dlgmess"></div><br/>
@@ -2592,6 +2725,8 @@ window.addEventListener("DOMContentLoaded", Init, false);
 
 <canvas id="cvwork1" width="256" height="256" style="display:none"></canvas>
 <canvas id="cvwork2" width="256" height="256" style="display:none"></canvas>
-
+<canvas id="cvworkh" width="128" height="128" style="display:none"></canvas>
+<canvas id="cvworkq" width="64" height="64" style="display:none"></canvas>
+<canvas id="cvworko" width="32" height="32" style="display:none"></canvas>
 </body>
 </html>
