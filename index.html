@@ -830,6 +830,7 @@ function Primitive(app,ly){
   this.texdepth=0;
   this.texzoom=100;
   this.round=0;
+  this.width=10;
   this.wave=0;
   this.waveangle=4;
   this.color=0xff8080;
@@ -865,9 +866,21 @@ function Primitive(app,ly){
         var divj=this.divr*j+j+divk;
         for(i=0;i<this.divr;++i){
           faces.push(new THREE.Face3(i+divj,i+divj+divp+1,i+divj+divp,new THREE.Vector3(0,0,1).normalize()));
-          uvs.push([this.uvstack[i+divj],this.uvstack[i+divj+divp+1],this.uvstack[i+divj+divp+1]]);
+          uvs.push([this.uvstack[i+divj],this.uvstack[i+divj+divp+1],this.uvstack[i+divj+divp]]);
           faces.push(new THREE.Face3(i+divj,i+divj+1,i+divj+1+divp,new THREE.Vector3(0,0,1).normalize()));
           uvs.push([this.uvstack[i+divj],this.uvstack[i+divj+1],this.uvstack[i+divj+1+divp]]);
+        }
+        if(j!=3){
+          faces.push(new THREE.Face3(i+divj,i+divj+divp+1,i+divj+divp,new THREE.Vector3(0,0,1).normalize()));
+          uvs.push([this.uvstack[i+divj],this.uvstack[i+divj+divp+1],this.uvstack[i+divj+divp]]);
+          faces.push(new THREE.Face3(i+divj,i+divj+1,i+divj+1+divp,new THREE.Vector3(0,0,1).normalize()));
+          uvs.push([this.uvstack[i+divj],this.uvstack[i+divj+1],this.uvstack[i+divj+1+divp]]);
+        }
+        else{
+          faces.push(new THREE.Face3(i+divj,i+divj-divp+1,i+divj+divp,new THREE.Vector3(0,0,1).normalize()));
+          uvs.push([this.uvstack[i+divj],this.uvstack[i+divj-divp+1],this.uvstack[i+divj+divp]]);
+          faces.push(new THREE.Face3(i+divj+divp,i+divj-divp+1,i+divj+1,new THREE.Vector3(0,0,1).normalize()));
+          uvs.push([this.uvstack[i+divj+divp],this.uvstack[i+divj-divp+1],this.uvstack[i+divj+1]]);
         }
       }
     }
@@ -898,9 +911,9 @@ function Primitive(app,ly){
     case "none":
       this.mesh.visible=false;
       break;
-    case "cylinder":
-    case "cube":
-      this.mesh.visible=true;
+    case "circle":
+    case "square":
+      this.mesh.visible=this.layer.visible;
       break;
     }
     if(this.mesh){
@@ -998,7 +1011,7 @@ function Primitive(app,ly){
       break;
     case "cylinder":
     case "cube":
-      this.mesh.visible=true;
+      this.mesh.visible=this.layer.visible;
       break;
     }
     if(this.mesh){
@@ -1017,6 +1030,7 @@ function Primitive(app,ly){
     switch(this.type){
     case "cylinder":
     case "cube":
+    case "none":
       this.BuildCylinder();
       break;
     default:
@@ -1041,6 +1055,8 @@ function Primitive(app,ly){
     case "normal":
       this.material.bumpMap=null;
       this.material.map=this.app.texture[this.texture].tex;
+      this.material.reflectivity=this.texdepth*.01;
+      this.material.refractionRatio=this.texdepth*.01;
       break;
     }
     this.material.color=new THREE.Color(this.color);
@@ -1050,9 +1066,11 @@ function Primitive(app,ly){
     switch(this.type){
     case "cylinder":
     case "cube":
+    case "none":
       this.MeshSetupCylinder();
       break;
-    default:
+    case "circle":
+    case "square":
       this.MeshSetupCircle();
       break;
     }
@@ -1061,6 +1079,35 @@ function Primitive(app,ly){
     var vtx=this.geometry.vertices;
     var uvs=this.uvstack;
     var nv=this._nv;
+
+    switch(this.type){
+    case "circle":
+      this._lx=this._ly=0;
+      if(this.aspect>=0){
+        this._rx=.5-.5*this.aspect/100;
+        this._ry=.5;
+      }
+      else{
+        this._rx=.5;
+        this._ry=.5+.5*this.aspect/100;
+      }
+      break;
+    case "square":
+      var px=1,py=1;
+      if(this.aspect>=0)
+        px=1-this.aspect/100;
+      else
+        py=1+this.aspect/100;
+      this._cx=Math.max(0,px-this.round/100);
+      this._cy=Math.max(0,py-this.round/100);
+      this._lx=px*this.width*.01;
+      this._ly=py*this.width*.01;
+      this._rx=this.round/200+0.001;
+      this._ry=this.round/200+0.001;
+      break;
+    }
+/*
+
     this._lx=this._ly=0;
     if(this.aspect>=0){
       this._rx=.5-.5*this.aspect/100;
@@ -1070,6 +1117,8 @@ function Primitive(app,ly){
       this._rx=.5;
       this._ry=.5+.5*this.aspect/100;
     }
+*/
+
     var emb=1-this.emboss/100;
     var embd=this.embossdiffuse/100;
     var lx2=this._lx/2;
@@ -1083,59 +1132,63 @@ function Primitive(app,ly){
     var nv=this._nv;
     var tz=.5/(this.texzoom*0.01);
     var v1,v2,v3,v4,v5,v6,v7,v8,u1,u2,u3,u4,u5,u6,u7,u8;
-    var c0=this.divh*nv*0.5|0;
-    for(i=0;i<=this.divr;++i){
-      var th=i*Math.PI*0.5/this.divr;
-      var wf=this.waveangle;
-      var w1=1+this.wave*.01*Math.cos(th*wf);
-      var w2=1+this.wave*.01*Math.cos((th+Math.PI*.5)*wf);
-      var w3=1+this.wave*.01*Math.cos((th+Math.PI)*wf);
-      var w4=1+this.wave*.01*Math.cos((th+Math.PI*1.5)*wf);
-      var sin=Math.sin(th);
-      var cos=Math.cos(th);
-      for(j=0;j<=this.divh;++j){
-        idx=i+j*nv*2;
-        v1=vtx[idx];
-        v2=vtx[1+this.divr+idx];
-        v3=vtx[2+this.divr*2+idx];
-        v4=vtx[3+this.divr*3+idx];
-        v5=vtx[idx+nv];
-        v6=vtx[1+this.divr+nv+idx];
-        v7=vtx[2+this.divr*2+nv+idx];
-        v8=vtx[3+this.divr*3+nv+idx];
-        u1=uvs[idx];
-        u2=uvs[1+this.divr+idx];
-        u3=uvs[2+this.divr*2+idx];
-        u4=uvs[3+this.divr*3+idx];
-        u5=uvs[idx+nv];
-        u6=uvs[1+this.divr+nv+idx];
-        u7=uvs[2+this.divr*2+nv+idx];
-        u8=uvs[3+this.divr*3+nv+idx];
-        if(j==this.divh){
-          u1.x=.5+(v1.x=(w1*rx2*sin+lx2))*tz; u1.y=.5+(v1.y=(w1*ry2*cos+ly2))*tz; v1.z=0;
-          u2.x=.5+(v2.x=(w2*rx2*cos+lx2))*tz; u2.y=.5+(v2.y=(w2*-ry2*sin-ly2))*tz; v2.z=0;
-          u3.x=.5+(v3.x=(w3*-rx2*sin-lx2))*tz; u3.y=.5+(v3.y=(w3*-ry2*cos-ly2))*tz; v3.z=0;
-          u4.x=.5+(v4.x=(w4*-rx2*cos-lx2))*tz; u4.y=.5+(v4.y=(w4*ry2*sin+ly2))*tz; v4.z=0;
-          u5.x=.5+(v5.x=(w1*rx2*sin+lx2)*.5)*tz; u5.y=.5+(v5.y=(w1*ry2*cos+ly2)*.5)*tz; v5.z=0;
-          u6.x=.5+(v6.x=(w2*rx2*cos+lx2)*.5)*tz; u6.y=.5+(v6.y=(w2*-ry2*sin-ly2)*.5)*tz; v6.z=0;
-          u7.x=.5+(v7.x=(w3*-rx2*sin-lx2)*.5)*tz; u7.y=.5+(v7.y=(w3*-ry2*cos-ly2)*.5)*tz; v7.z=0;
-          u8.x=.5+(v8.x=(w4*-rx2*cos-lx2)*.5)*tz; u8.y=.5+(v8.y=(w4*ry2*sin+ly2)*.5)*tz; v8.z=0;
+    var c0=(this.divh+1)*nv;
+    var h,k,j,i;
+    var width=(100-this.width)*.01;
+    var wf=this.waveangle;
+    var deflate1=width+this.emboss*(1-width)*.005;
+    var deflate2=1+this.emboss*(width-1)*.005;
+    var defc=(deflate1+deflate2)*.5;
+    var def1s1=deflate1+(width-deflate1)*this.embossdiffuse*.01;
+    var def1s2=deflate1+(defc-deflate1)*this.embossdiffuse*.01;
+    var def2s1=deflate2+(defc-deflate2)*this.embossdiffuse*.01;
+    var def2s2=deflate2+(1-deflate2)*this.embossdiffuse*.01;
+    var h0=this.height-this.height*this.embossdiffuse*.01;
+    var wr1,wr2;
+    for(k=0;k<=this.divh;++k){
+      if(k==0){
+        wr1=width;
+        wr2=1;
+        h=0;
+      }
+      else{
+        var ratio=k/this.divh;
+        var q1=this.GetBezier(ratio, def1s1,h0, deflate1,this.height, def1s2,this.height);
+        var q2=this.GetBezier(ratio, def2s2,h0, deflate2,this.height, def2s1,this.height);
+        wr1=q1[0];
+        wr2=q2[0];
+        h=q1[1];
+      }
+      for(j=0;j<4;++j){
+        var llx,lly;
+        switch(j){
+        case 0:
+          llx=lx2;
+          lly=ly2;
+          break;
+        case 1:
+          llx=lx2;
+          lly=-ly2;
+          break;
+        case 2:
+          llx=-lx2;
+          lly=-ly2;
+          break;
+        case 3:
+          llx=-lx2;
+          lly=ly2;
+          break;
         }
-        else{
-          var ratio=j/(this.divh-1);
-          var q=this.GetBezier(ratio,emb*(1-embd),this.height, emb,this.height,  (emb+(1-emb)*embd),this.height*(1-embd));
-          var rrx,rry,llx,lly,hh;
-          rrx=rx2*q[0]; rry=ry2*q[0];
-          llx=lx2*q[0]; lly=ly2*q[0];
-          hh=q[1];
-          u1.x=.5+(v1.x=w1*rrx*sin+llx)*tz; u1.y=.5+(v1.y=w1*rry*cos+lly)*tz; v1.z=hh;
-          u2.x=.5+(v2.x=w2*rrx*cos+llx)*tz; u2.y=.5+(v2.y=w2*-rry*sin-lly)*tz; v2.z=hh;
-          u3.x=.5+(v3.x=w3*-rrx*sin-llx)*tz; u3.y=.5+(v3.y=w3*-rry*cos-lly)*tz; v3.z=hh;
-          u4.x=.5+(v4.x=w4*-rrx*cos-llx)*tz; u4.y=.5+(v4.y=w4*rry*sin+lly)*tz; v4.z=hh;
-          u5.x=.5+(v5.x=(w1*rrx*sin+llx)*.5)*tz; u5.y=.5+(v5.y=(w1*rry*cos+lly)*.5)*tz; v5.z=hh;
-          u6.x=.5+(v6.x=(w2*rrx*cos+llx)*.5)*tz; u6.y=.5+(v6.y=(w2*-rry*sin-lly)*.5)*tz; v6.z=hh;
-          u7.x=.5+(v7.x=(w3*-rrx*sin-llx)*.5)*tz; u7.y=.5+(v7.y=(w3*-rry*cos-lly)*.5)*tz; v7.z=hh;
-          u8.x=.5+(v8.x=(w4*-rrx*cos-llx)*.5)*tz; u8.y=.5+(v8.y=(w4*rry*sin+lly)*.5)*tz; v8.z=hh;
+        for(i=0;i<=this.divr;++i){
+          var th=Math.PI*.5*(j+i/this.divr);
+          var sin=Math.sin(th);
+          var cos=Math.cos(th);
+          var w1=1+this.wave*.01*Math.cos(th*wf);
+          var idx1=i+j*(this.divr+1)+k*nv;
+          var idx2=i+j*(this.divr+1)+((this.divh+1)*2-k-2)*nv;
+          var v1=vtx[idx1],v2=vtx[idx2],u1=uvs[idx1],u2=uvs[idx2];
+          u1.x=.5+(v1.x=rx2*sin*w1*wr1+llx)*tz; u1.y=.5+(v1.y=ry2*cos*w1*wr1+lly)*tz; v1.z=h;
+          u2.x=.5+(v2.x=rx2*sin*w1*wr2+llx)*tz; u2.y=.5+(v2.y=ry2*cos*w1*wr2+lly)*tz; v2.z=h;
         }
       }
     }
@@ -1348,12 +1401,14 @@ function Layer(app,n){
       break;
     case "type":
       this.prim.type=v;
+      this.app.UpdateParamVisible(v);
       if(this.prim.mesh)
         this.prim.mesh.visible=this.visible&&(this.prim.type!="none");
       this.prim.Rebuild();
       this.prim.MeshSetup();
       this.prim.geometry.uvsNeedUpdate=true;
       this.app.UpdateLayerPane();
+      this.eff.Apply(this.app.curRatio);
       break;
     case "divr":
       this.prim.divr=parseInt(v);
@@ -1376,6 +1431,11 @@ function Layer(app,n){
     case "round":
       this.prim.round=parseFloat(v);
 //      this.prim.Rebuild();
+      this.prim.MeshSetup();
+      this.prim.geometry.uvsNeedUpdate=true;
+      break;
+    case "width":
+      this.prim.width=parseFloat(v);
       this.prim.MeshSetup();
       this.prim.geometry.uvsNeedUpdate=true;
       break;
@@ -1688,6 +1748,7 @@ function KnobData(ap) {
     Def(tp,"divh",p.prim.divh,16);
     Def(tp,"aspect",p.prim.aspect,0);
     Def(tp,"round",p.prim.round,0);
+    Def(tp,"width",p.prim.width,10);
     Def(tp,"wave",p.prim.wave,0);
     Def(tp,"waveangle",p.prim.waveangle,4);
     Def(tp,"deflate",p.prim.emboss,0);
@@ -1741,6 +1802,7 @@ function App() {
   this.primpane=document.getElementById("primpane");
   this.effpane=document.getElementById("effpane");
   this.primpane.appendChild(this.colorPicker.element);
+  this.colorPicker.element.id="row_color";
   this.animate=false;
   this.animatedir=1;
   this.animateid=0;
@@ -1751,6 +1813,7 @@ function App() {
   this.exportwidth=64;
   this.exportheight=64;
   this.exportframes=17;
+  this.exporthqresize=true;
   this.exportexec=null;
   document.getElementById("exporttype").value=this.exporttype;
   document.getElementById("exportwidth").value=this.exportwidth;
@@ -1912,6 +1975,7 @@ function App() {
       Set(p.prim,"divh",l.prim.divh);
       Set(p.prim,"aspect",l.prim.aspect);
       Set(p.prim,"round",l.prim.round);
+      Set(p.prim,"width",l.prim.width);
       Set(p.prim,"wave",l.prim.wave);
       Set(p.prim,"waveangle",l.prim.waveangle);
       Set(p.prim,"emboss",l.prim.deflate);
@@ -2229,6 +2293,12 @@ function App() {
         case "cube":
           ic.src="images/rectfill.svg";
           break;
+        case "circle":
+          ic.src="images/circle.svg";
+          break;
+        case "square":
+          ic.src="images/square.svg";
+          break;
         }
       }
       else {
@@ -2236,6 +2306,43 @@ function App() {
       }
     }
   }
+  this.UpdateParamVisible=function(type){
+    function Set(n){
+          document.getElementById("row_divr").style.display=(n&0x1)?"block":"none";
+          document.getElementById("row_divh").style.display=(n&0x2)?"block":"none";
+          document.getElementById("row_aspect").style.display=(n&0x4)?"block":"none";
+          document.getElementById("row_round").style.display=(n&0x8)?"block":"none";
+          document.getElementById("row_width").style.display=(n&0x10)?"block":"none";
+          document.getElementById("row_wavedepth").style.display=(n&0x20)?"block":"none";
+          document.getElementById("row_waveangle").style.display=(n&0x40)?"block":"none";
+          document.getElementById("row_deflate").style.display=(n&0x80)?"block":"none";
+          document.getElementById("row_smooth").style.display=(n&0x100)?"block":"none";
+          document.getElementById("row_height").style.display=(n&0x200)?"block":"none";
+          document.getElementById("row_shininess").style.display=(n&0x400)?"block":"none";
+          document.getElementById("row_texture").style.display=(n&0x800)?"block":"none";
+          document.getElementById("row_textype").style.display=(n&0x1000)?"block":"none";
+          document.getElementById("row_texdepth").style.display=(n&0x2000)?"block":"none";
+          document.getElementById("row_texzoom").style.display=(n&0x4000)?"block":"none";
+          document.getElementById("row_color").style.display=(n&0x8000)?"block":"none";
+    }
+    switch(type){
+    case "none":
+      Set(0);
+      break;
+    case "cylinder":
+      Set(0xffe7);
+      break;
+    case "cube":
+      Set(0xffef);
+      break;
+    case "circle":
+      Set(0xfff7);
+      break;
+    case "square":
+      Set(0xffff);
+      break;
+    }
+  };
   this.SelLayer=function(n){
     this.curLayer=n;
     for(var i=0;i<this.maxlayer;++i){
@@ -2253,10 +2360,12 @@ function App() {
     var p=this.layer[this.curLayer].prim;
     var e=this.layer[this.curLayer].eff;
     document.getElementById("type").value=p.type;
+    this.UpdateParamVisible(p.type);
     document.getElementById("divr").value=p.divr;
     document.getElementById("divh").value=p.divh;
     document.getElementById("aspect").value=p.aspect;
     document.getElementById("round").value=p.round;
+    document.getElementById("width").value=p.width;
     document.getElementById("wave").value=p.wave;
     document.getElementById("waveangle").value=p.waveangle;
     document.getElementById("emboss").value=p.emboss;
@@ -2505,9 +2614,10 @@ function App() {
     l2.name=app.FindUnusedLayerNum();
     l2.prim.type=l1.prim.type;
     l2.prim.divr=l1.prim.divr;
-    l2.prim.divh=l1.pirm.divh;
+    l2.prim.divh=l1.prim.divh;
     l2.prim.aspect=l1.prim.aspect;
     l2.prim.round=l1.prim.round;
+    l2.prim.width=l1.prim.width;
     l2.prim.wave=l1.prim.wave;
     l2.prim.waveangle=l1.prim.waveangle;
     l2.prim.emboss=l1.prim.emboss;
@@ -2700,21 +2810,22 @@ window.addEventListener("DOMContentLoaded", Init, false);
     <option value="none" icon="images/none.png">None</option>
     <option value="cylinder">Cylinder</option>
     <option value="cube">Cube</option>
-<!--    <option value="circle">Circle</option>-->
+    <option value="circle">Circle</option>
   </select>
 </div>
-<div class="primrow"><div class="primlabel">DivR:</div> <input id="divr" type="text" value="16" size="10" oninput="app.Setup('divr',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'divr',1,100)"></button></div>
-<div class="primrow"><div class="primlabel">DivH:</div> <input id="divh" type="text" value="16" size="10" oninput="app.Setup('divh',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'divh',1,100)"></button></div>
-<div class="primrow"><div class="primlabel">Aspect:</div> <input id="aspect" type="text" value="0" size="10" oninput="app.Setup('aspect',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'aspect',-100,100)"></button></div>
-<div class="primrow"><div class="primlabel">Round:</div> <input id="round" type="text" value="10" size="10" oninput="app.Setup('round',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'round',0,100)"></button></div>
-<div class="primrow"><div class="primlabel">WaveDepth:</div> <input id="wave" type="text" value="0" size="10" oninput="app.Setup('wave',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'wave',0,100)"></button></div>
-<div class="primrow"><div class="primlabel">WaveAngle:</div> <input id="waveangle" type="text" value="4" size="10" oninput="app.Setup('waveangle',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'waveangle',1,100)"></button></div>
-<div class="primrow"><div class="primlabel">Deflate:</div> <input id="emboss" type="text" value="0" size="10" oninput="app.Setup('emboss',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'emboss',-100,100)"></button></div>
-<div class="primrow"><div class="primlabel">Smooth:</div> <input id="embossdiffuse" type="text" value="0" size="10" oninput="app.Setup('embossdiffuse',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'embossdiffuse',0,100)"></button></div>
-<div class="primrow"><div class="primlabel">Height:</div> <input id="height" type="text" value="1" size="10" oninput="app.Setup('height',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'height',0,100)"></button></div>
-<div class="primrow"><div class="primlabel">Shininess:</div> <input id="shininess" type="text" value="30" size="10" oninput="app.Setup('shininess',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'shininess',0,400)"></button></div>
+<div class="primrow" id="row_divr"><div class="primlabel">DivR:</div> <input id="divr" type="text" value="16" size="10" oninput="app.Setup('divr',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'divr',1,100)"></button></div>
+<div class="primrow" id="row_divh"><div class="primlabel">DivH:</div> <input id="divh" type="text" value="16" size="10" oninput="app.Setup('divh',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'divh',1,100)"></button></div>
+<div class="primrow" id="row_aspect"><div class="primlabel">Aspect:</div> <input id="aspect" type="text" value="0" size="10" oninput="app.Setup('aspect',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'aspect',-100,100)"></button></div>
+<div class="primrow" id="row_round"><div class="primlabel">Round:</div> <input id="round" type="text" value="10" size="10" oninput="app.Setup('round',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'round',0,100)"></button></div>
+<div class="primrow" id="row_width"><div class="primlabel">Width:</div> <input id="width" type="text" value="10" size="10" oninput="app.Setup('width',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'width',1,100)"></button></div>
+<div class="primrow" id="row_wavedepth"><div class="primlabel">WaveDepth:</div> <input id="wave" type="text" value="0" size="10" oninput="app.Setup('wave',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'wave',0,100)"></button></div>
+<div class="primrow" id="row_waveangle"><div class="primlabel">WaveAngle:</div> <input id="waveangle" type="text" value="4" size="10" oninput="app.Setup('waveangle',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'waveangle',1,100)"></button></div>
+<div class="primrow" id="row_deflate"><div class="primlabel">Deflate:</div> <input id="emboss" type="text" value="0" size="10" oninput="app.Setup('emboss',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'emboss',-100,100)"></button></div>
+<div class="primrow" id="row_smooth"><div class="primlabel">Smooth:</div> <input id="embossdiffuse" type="text" value="0" size="10" oninput="app.Setup('embossdiffuse',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'embossdiffuse',0,100)"></button></div>
+<div class="primrow" id="row_height"><div class="primlabel">Height:</div> <input id="height" type="text" value="1" size="10" oninput="app.Setup('height',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'height',0,100)"></button></div>
+<div class="primrow" id="row_shininess"><div class="primlabel">Shininess:</div> <input id="shininess" type="text" value="30" size="10" oninput="app.Setup('shininess',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'shininess',0,400)"></button></div>
 <!--<div class="primrow"><div class="primlabel">Metalic:</div> <input id="metalic" type="text" value="0" size="10" oninput="app.Setup('metalic',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'metalic',0,100)"></button></div>-->
-<div class="primrow"><div class="primlabel">Texture:</div> <select id="texture" onchange="app.Setup('texture',this.options[selectedIndex].value)">
+<div class="primrow" id="row_texture"><div class="primlabel">Texture:</div> <select id="texture" onchange="app.Setup('texture',this.options[selectedIndex].value)">
   <option value="Aura">Aura</option>
   <option value="Checkers">Checkers</option>
   <option value="Circle">Circle</option>
@@ -2733,12 +2844,12 @@ window.addEventListener("DOMContentLoaded", Init, false);
   <option value="Scratch">Scratch</option>
   <option value="chikuwa">chikuwa</option>
 </select></div>
-<div class="primrow"><div class="primlabel">TexType:</div> <select id="textype" onchange="app.Setup('textype',this.options[selectedIndex].value)">
+<div class="primrow" id="row_textype"><div class="primlabel">TexType:</div> <select id="textype" onchange="app.Setup('textype',this.options[selectedIndex].value)">
   <option value="normal">Normal</option>
   <option value="bump" selected>Bump</option>
 </select></div>
-<div class="primrow"><div class="primlabel">TexDepth:</div> <input id="texdepth" type="text" value="1" size="10" oninput="app.Setup('texdepth',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'texdepth',-200,200)"></button></div>
-<div class="primrow"><div class="primlabel">TexZoom:</div> <input id="texzoom" type="text" value="1" size="10" oninput="app.Setup('texzoom',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'texzoom',0,200)"></button></div>
+<div class="primrow" id="row_texdepth"><div class="primlabel">TexDepth:</div> <input id="texdepth" type="text" value="1" size="10" oninput="app.Setup('texdepth',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'texdepth',-200,200)"></button></div>
+<div class="primrow" id="row_texzoom"><div class="primlabel">TexZoom:</div> <input id="texzoom" type="text" value="1" size="10" oninput="app.Setup('texzoom',this.value)"/><button class="spin" onmousedown="app.EditValue(event,'texzoom',0,200)"></button></div>
 </div>
 </div>
 <div id="prevbase">
@@ -2891,7 +3002,7 @@ window.addEventListener("DOMContentLoaded", Init, false);
       <div class="exprow"><div class="explabel">height:</div><input id="exportheight" type="text" size="3" onchange="app.Setup('exportheight',this.value)"/></div>
       <div class="exprow"><div class="explabel">frames:</div><input id="exportframes" type="text" size="3" onchange="app.Setup('exportframes',this.value)"/></div>
       <div class="exprow"><div class="explabel">Shuttle(for animation):</div><input id="exportshuttle" type="checkbox" onchange="app.Setup('exportshuttle',this.checked)"/></div>
-      <div class="exprow"><div class="explabel">HQ resize:</div><input id="exporthqresize" type="checkbox" onchange="app.Setup('exporthqresize',this.checked)"/></div>
+      <div class="exprow"><div class="explabel">HQ resize:</div><input id="exporthqresize" type="checkbox" checked onchange="app.Setup('exporthqresize',this.checked)"/></div>
       <button onclick="app.Export()">Apply</button>
       <button onclick="app.Download()">Download</button>
       <button onclick="app.CloseExport()">Close</button>
