@@ -1030,6 +1030,8 @@ function Primitive(app,ly){
       this.BuildCircle();
       break;
     }
+    if(this.mesh)
+      this.mesh.renderOrder=this.layer.num;
   }
   this.GetBezier=function(t,x1,y1,x2,y2,x3,y3){
     var tp=1-t;
@@ -1370,7 +1372,7 @@ function Effect(app,ly){
     pr.material.opacity=alpha/100;
     var c=(new Col(this.layer.prim.color)).ChangeColor(brightness,hue);
     pr.material.color=new THREE.Color(c.GetColor24());
-    pr.mesh.renderOrder=this.layer.num;
+//    pr.mesh.renderOrder=this.layer.num;
   }
 }
 function Layer(app,n){
@@ -2570,6 +2572,8 @@ function App() {
   this.LayerRenum=function(){
     for(var i=0;this.layer[i];++i){
       this.layer[i].num=i;
+      if(this.layer[i].prim.mesh)
+        this.layer[i].prim.mesh.renderOrder=i;
     }
   };
   this.FindUnusedLayerNum=function(){
