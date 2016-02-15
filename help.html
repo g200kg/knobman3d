@@ -171,8 +171,13 @@ Chrome を使用するか、Rendering paneの "Shadow" 設定を 0 にすると�
   <tr><td>New</td>
     <td>作成中のデータを消去します。</td>
   </tr>
+  <tr><td>Load</td>
+    <td>SaveAsURLコマンドで保存されたデータをロードするためのダイアログを開きます。URLが長くなりすぎてブラウザで直接開けない場合はこのダイアログからデータを読み込む事ができます。
+    </td>
+  </tr>
   <tr><td>SaveAsURL</td>
-    <td>作成中のデータを表すURL形式の保存データを表示します。このURLをブラウザで開く事でデータの編集を再開できます。</td>
+    <td>作成中のデータを表すURL形式の保存データを表示します。このURLをブラウザで開く事でデータの編集を再開できます。
+      なおデータが複雑になりURLが長くなりすぎた場合はブラウザで直接開く事ができなくなります。この場合はLoadコマンドで開くダイアログにURLデータを貼り付ける事でロードできます。</td>
   </tr>
   <tr><td>Export</td>
     <td>PNGまたはアニメーションGIF形式で画像ファイルとして出力します。このコマンドを実行するとエクスポートの詳細を指定するダイアログが開きます。</td>
@@ -192,6 +197,12 @@ Chrome を使用するか、Rendering paneの "Shadow" 設定を 0 にすると�
   <tr><td>Fore</td>
     <td>現在フォーカスしているオブジェクトをObjList上1つ下に移動します。</td>
   </tr>
+  <tr><td>Rename</td>
+    <td>オブジェクトに任意の名前を付けるためのダイアログを開きます。付けられた名前はObject List上に表示されます。</td>
+  </tr>
+  <tr><td>Help</td>
+    <td>この画面を開きます。</td>
+  </tr>
 </table>
 </div>
 <div class="doc_en">
@@ -203,8 +214,15 @@ Chrome を使用するか、Rendering paneの "Shadow" 設定を 0 にすると�
     <tr><td>New</td>
       <td>Clear current data.</td>
     </tr>
+    <tr><td>Load</td>
+      <td>Open a dialog for data-load that saved by 'SaveAsURL' command.
+        If the URL is too long for directl open with browser, you should paste the URL to this dialog.
+      </td>
+    </tr>
     <tr><td>SaveAsURL</td>
-      <td>Display current modeling data as a URL. Data can be load by opening this URL with a browser.</td>
+      <td>Display current modeling data as a URL. Data can be load by opening this URL with a browser.
+        Note that if the URL become too long to direct open with browser, you should use 'Load' command instead.
+      </td>
     </tr>
     <tr><td>Export</td>
       <td>Export rendering result as PNG or AnimationGIF. Detail dialog will be open with this button.</td>
@@ -224,11 +242,17 @@ Chrome を使用するか、Rendering paneの "Shadow" 設定を 0 にすると�
     <tr><td>Fore</td>
       <td>Move current focused object down.</td>
     </tr>
+    <tr><td>Rename</td>
+      <td>Rename the object. the name will be shown in 'Object List'.</td>
+    </tr>
+    <tr><td>Help</td>
+      <td>Open this page.</td>
+    </tr>
   </table>
 </div>
 
 <div class="doc_ja">
-<h2>ObjList</h2>
+<h2>Object List</h2>
 <img src="images/objlist.png" style="float:left;margin:10px"/>
 <p>ここには使用している基本オブジェクトの一覧が表示されます。
   1行だけ明るく表示されているのが現在フォーカスしているオブジェクトになり、各行をクリックする事で切り替える事ができます。
@@ -255,14 +279,18 @@ Chrome を使用するか、Rendering paneの "Shadow" 設定を 0 にすると�
 <p>各オブジェクトの形状や色をこれらのパラメータで指定します。</p>
 <table>
   <tr><th>パラメータ</th><th>説明</th></tr>
-  <tr><td>Type</td><td>基本形状を指定します。"Cylinder" と "Cube" の2種類があります。
+  <tr><td>Type</td><td>基本形状を指定します。基本形状として "Cylinder"、"Cube"、"Circle" があります。
     <table><tr><td><img src="images/cylinder.png"/></td><td><img src="images/cube.png"/></td></tr><tr><td>Cylinder</td><td>Cube</td></tr></table>
   </td></tr>
+  <tr><td>DivR</td><td>オブジェクトの円周方向の分割数を指定します。</td></tr>
+  <tr><td>DivH</td><td>オブジェクトの高さ方向の分割数を指定します。</td></tr>
   <tr><td>Aspect</td><td>形状の(真上から見た時の)縦横比を設定します。
     <table><tr><td><img src="images/aspect1.png"/></td><td><img src="images/cylinder.png"/></td><td><img src="images/aspect2.png"/></td></tr><tr><td>Aspect = -50</td><td>Aspect = 0</td><td>Aspect = 50</td></tr></table>
   </td></tr>
   <tr><td>Round</td><td>Cubeを真上から見た時の角を丸くします。このパラメータはCylinderでは無効です。
     <table><tr><td><img src="images/cube.png"/></td><td><img src="images/round1.png"/></td></tr><tr><td>Round = 0</td><td>Round = 25</td></tr></table>
+  </td></tr>
+  <tr><td>Width</td><td>Circleの幅を指定します。Circle以外の形状では無効です。
   </td></tr>
   <tr><td>WaveDepth<br/>WaveAngle</td><td>Cylinderを真上から見た時の周囲を波打たせます。WaveDepthは波の振幅、WaveAngleは波の頂点の数を表します。Cubeに対しても有効ですが、Roundパラメータで角を丸めた部分にのみ効果があります。
     <table><tr><td><img src="images/wave.png"/></td></tr><tr><td>WaveDepth=20<br/>WaveAngle=5</td></tr></table>
@@ -283,7 +311,7 @@ Chrome を使用するか、Rendering paneの "Shadow" 設定を 0 にすると�
     <ul>
       <li>Textureは使用する模様のビットマップの指定です。</li>
       <li>TexTypeはBumpの場合表面の凹凸として表現され、Normalの場合はビットマップがそのまま貼り付けられます。</li>
-      <li>TexDepthはBumpの強さを指定します。値がプラスの場合模様が浮き出る方向に、マイナスの場合には彫り込まれる方向に働きます。このパラメータはTexTypeがNormalの場合無効です。</li>
+      <li>TexDepthはテクスチャーの強さを指定します。TexTypeがBumpの場合、値がプラスの場合模様が浮き出る方向に、マイナスの場合には彫り込まれる方向に働きます。</li>
       <li>TexZoomはテクスチャーの拡大率です。</li>
     </ul>
     <table><tr><td><img src="images/texsand100.png"/></td><td><img src="images/texfabric100.png"/></td><td><img src="images/texmosaic150.png"/></td></tr><tr><td>Texture=Sand<br/>TexType=Bump<br/>TexDepth=100<br/>TexZoom=100</td><td>Texture=Fabric<br/>TexType=Bump<br/>TexDepth=100<br/>TexZoom=100</td><td>Texture=Mosaic<br/>TexType=Bump<br/>TexDepth=-150<br/>TexZoom=120</td></tr></table>
@@ -301,14 +329,18 @@ Chrome を使用するか、Rendering paneの "Shadow" 設定を 0 にすると�
   <p>The shapes or colors are determined by these parameters.</p>
   <table>
     <tr><th>Parameter</th><th>Description</th></tr>
-    <tr><td>Type</td><td>Specify the basic shape, "Cylinder" or "Cube".
+    <tr><td>Type</td><td>Specify the basic shape, "Cylinder", "Cube" or "Circle".
       <table><tr><td><img src="images/cylinder.png"/></td><td><img src="images/cube.png"/></td></tr><tr><td>Cylinder</td><td>Cube</td></tr></table>
     </td></tr>
+    <tr><td>DivR</td><td>Object division number of circumferential direction.</td></tr>
+    <tr><td>DivH</td><td>Object division number of height direction.</td></tr>
     <tr><td>Aspect</td><td>Specify aspect ratio in X-Y plane (means from just above).
       <table><tr><td><img src="images/aspect1.png"/></td><td><img src="images/cylinder.png"/></td><td><img src="images/aspect2.png"/></td></tr><tr><td>Aspect = -50</td><td>Aspect = 0</td><td>Aspect = 50</td></tr></table>
     </td></tr>
-    <tr><td>Round</td><td>Round the corner (from just above) of Cube. This parameter is ignored in "Cylinder".
+    <tr><td>Round</td><td>Round the corner (from just above) of 'Cube'. This parameter is not available in other shapes.
       <table><tr><td><img src="images/cube.png"/></td><td><img src="images/round1.png"/></td></tr><tr><td>Round = 0</td><td>Round = 25</td></tr></table>
+    </td></tr>
+    <tr><td>Width</td><td>Circle width. This parameter is not available in other shapes.
     </td></tr>
     <tr><td>WaveDepth<br/>WaveAngle</td><td>Waving effect of circumference of "Cylinder". WaveDepth is the amplitude of the wave, and WaveAngle is the number of peaks. This parameter also affect to "Cube" but only for "Rounded" corners.
       <table><tr><td><img src="images/wave.png"/></td></tr><tr><td>WaveDepth=20<br/>WaveAngle=5</td></tr></table>
@@ -329,7 +361,7 @@ Chrome を使用するか、Rendering paneの "Shadow" 設定を 0 にすると�
       <ul>
         <li>Texture is the bitmap pattern to use.</li>
         <li>TexType, "Bump" means the representation as a unevenness of surface, "Normal" means directly use of bitmap as the surface.</li>
-        <li>TexDepth is the intensity of bumping of "Bump" type texture. It will be ignored in "Normal" type texture.</li>
+        <li>TexDepth is the intensity of texture. In "Bump" mode, positive value means convex and negative value means engraved.</li>
       </ul>
       <li>TexZoom is the scaling factor of texture.</li>
       <table><tr><td><img src="images/texsand100.png"/></td><td><img src="images/texfabric100.png"/></td><td><img src="images/texmosaic150.png"/></td></tr><tr><td>Texture=Sand<br/>TexType=Bump<br/>TexDepth=100<br/>TexZoom=100</td><td>Texture=Fabric<br/>TexType=Bump<br/>TexDepth=100<br/>TexZoom=100</td><td>Texture=Mosaic<br/>TexType=Bump<br/>TexDepth=-150<br/>TexZoom=120</td></tr></table>

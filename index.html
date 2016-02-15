@@ -408,9 +408,9 @@ function Col(r, g, b) {
         else
             tmp2 = l + s - ((l * s) + 120) / 240;
         tmp1 = 2 * l - tmp2;
-        this.r = (this.htorgb(tmp1, tmp2, h + (240 / 3)) * 255 + (240 / 2)) / 240;
-        this.g = (this.htorgb(tmp1, tmp2, h) * 255 + (240 / 2)) / 240;
-        this.b = (this.htorgb(tmp1, tmp2, h - (240 / 3)) * 255 + (240 / 2)) / 240;
+        this.r = Math.min(255,(this.htorgb(tmp1, tmp2, h + (240 / 3)) * 255 + (240 / 2)) / 240);
+        this.g = Math.min(255,(this.htorgb(tmp1, tmp2, h) * 255 + (240 / 2)) / 240);
+        this.b = Math.min(255,(this.htorgb(tmp1, tmp2, h - (240 / 3)) * 255 + (240 / 2)) / 240);
       }
   };
   this.hlstorgb=function(){
@@ -714,14 +714,14 @@ function ColorPicker(){
     this.ctxColorMap.fillRect(0,119-this.curColor.s*.5,120,1);
   };
   this.SetMap=function(pos){
-    this.curColor.SetHls(this.curColor.h=Math.min(238,pos.x*2), this.curColor.l, this.curColor.s = (120 - pos.y) * 2);
+    this.curColor.SetHls(this.curColor.h=Math.min(238,pos.x*2), this.curColor.l, this.curColor.s=Math.max(0,(119-pos.y)*2));
     this.SetColorBar(this.curColor);
     this.UpdateCurColor();
     if(this.callback)
       this.callback(this.curColor);
   };
   this.SetBar=function(pos){
-    this.curColor.SetHls(this.curColor.h, this.curColor.l=238-pos.y*2, this.curColor.s);
+    this.curColor.SetHls(this.curColor.h, this.curColor.l=Math.max(0,238-pos.y*2), this.curColor.s);
     this.UpdateCurColor();
     if(this.callback)
       this.callback(this.curColor);
@@ -837,6 +837,13 @@ function Primitive(app,ly){
   this.aspect=0;
   this.shininess=30;
   this.metalic=0;
+  this.texcanvas=document.createElement("canvas");
+  this.texcanvas.width=256;
+  this.texcanvas.height=256;
+  this.tex=new THREE.Texture(this.texcanvas);
+  this.tex.wrapS=THREE.RepeatWrapping;
+  this.tex.wrapT=THREE.RepeatWrapping;
+  this.texctx=this.texcanvas.getContext("2d");
 //  this.mx=new THREE.Matrix4();
   this.Rebuild=function(){
     if(this.mesh){
@@ -884,15 +891,8 @@ function Primitive(app,ly){
         }
       }
     }
-    switch(this.textype){
-    case "bump":
-      this.material=new THREE.MeshPhongMaterial( { color:this.color, bumpMap:this.app.texture[this.texture].tex, transparent:true } );
-      break;
-    case "normal":
-      this.material=new THREE.MeshPhongMaterial( { color:this.color, map:this.app.texture[this.texture].tex, transparent:true } );
-      break;
-    }
-    this.material.bumpScale=this.texdepth*.05;
+    this.material=new THREE.MeshPhongMaterial( { color:this.color, transparent:true } );
+    this.material.bumpScale=this.texdepth*.02;
     this.material.shininess=this.shininess;
     this.material.shading = THREE.FlatShading;
     if(this.metalic>=50){
@@ -982,15 +982,8 @@ function Primitive(app,ly){
     uvs.push([this.uvstack[0],this.uvstack[2],this.uvstack[1]]);
     faces.push(new THREE.Face3(2,0,3));
     uvs.push([this.uvstack[2],this.uvstack[0],this.uvstack[3]]);
-    switch(this.textype){
-    case "bump":
-      this.material=new THREE.MeshPhongMaterial( { color:this.color, bumpMap:this.app.texture[this.texture].tex, transparent:true } );
-      break;
-    case "normal":
-      this.material=new THREE.MeshPhongMaterial( { color:this.color, map:this.app.texture[this.texture].tex, transparent:true } );
-      break;
-    }
-    this.material.bumpScale=this.texdepth*.05;
+    this.material=new THREE.MeshPhongMaterial( { color:this.color, transparent:true } );
+    this.material.bumpScale=this.texdepth*.02;
     this.material.shininess=this.shininess;
     this.material.shading = THREE.FlatShading;
     if(this.metalic>=50){
@@ -1045,7 +1038,7 @@ function Primitive(app,ly){
     return [x,y];
   };
   this.MatSetup=function(){
-    this.material.bumpScale=this.texdepth*.05;
+    this.material.bumpScale=this.texdepth*.02;
     this.material.shininess=this.shininess;
     switch(this.textype){
     case "bump":
@@ -1054,9 +1047,13 @@ function Primitive(app,ly){
       break;
     case "normal":
       this.material.bumpMap=null;
-      this.material.map=this.app.texture[this.texture].tex;
-      this.material.reflectivity=this.texdepth*.01;
-      this.material.refractionRatio=this.texdepth*.01;
+      this.material.map=this.tex;
+      this.texctx.fillStyle="#ffffff";
+      this.texctx.globalAlpha=1;
+      this.texctx.fillRect(0,0,256,256);
+      this.texctx.globalAlpha=Math.max(0,this.texdepth*.01);
+      this.texctx.drawImage(this.app.texture[this.texture].image,0,0,256,256);
+      this.tex.needsUpdate=true;
       break;
     }
     this.material.color=new THREE.Color(this.color);
@@ -1373,6 +1370,7 @@ function Effect(app,ly){
     pr.material.opacity=alpha/100;
     var c=(new Col(this.layer.prim.color)).ChangeColor(brightness,hue);
     pr.material.color=new THREE.Color(c.GetColor24());
+    pr.mesh.renderOrder=this.layer.num;
   }
 }
 function Layer(app,n){
@@ -1415,12 +1413,14 @@ function Layer(app,n){
       this.prim.Rebuild();
       this.prim.MeshSetup();
       this.prim.geometry.uvsNeedUpdate=true;
+      this.eff.Apply(this.app.curRatio);
       break;
     case "divh":
       this.prim.divh=parseInt(v);
       this.prim.Rebuild();
       this.prim.MeshSetup();
       this.prim.geometry.uvsNeedUpdate=true;
+      this.eff.Apply(this.app.curRatio);
       break;
     case "aspect":
       this.prim.aspect=parseFloat(v);
@@ -1580,60 +1580,65 @@ function Layer(app,n){
       break;
     case "alpha1":
       this.eff.alpha1=parseFloat(v);
-//      this.prim.material.opacity=this.eff.alpha1/100;
-//      this.prim.material.needsUpdate=true;
-
       this.prim.Rebuild();
       this.prim.MeshSetup();
-      this.eff.Apply(this.app.curRatio);
       this.prim.MatSetup();
+      this.eff.Apply(this.app.curRatio);
       break;
     case "alpha2":
       this.eff.alpha2=parseFloat(v);
       this.prim.Rebuild();
       this.prim.MeshSetup();
+      this.prim.MatSetup();
       this.eff.Apply(this.app.curRatio);
       break;
     case "alphaanim":
       this.eff.alphaanim=v;
       this.prim.Rebuild();
       this.prim.MeshSetup();
+      this.prim.MatSetup();
       this.eff.Apply(this.app.curRatio);
       break;
     case "brightness1":
       this.eff.brightness1=parseFloat(v);
       this.prim.Rebuild();
       this.prim.MeshSetup();
+      this.prim.MatSetup();
       this.eff.Apply(this.app.curRatio);
       break;
     case "brightness2":
       this.eff.brightness2=parseFloat(v);
       this.prim.Rebuild();
       this.prim.MeshSetup();
+      this.prim.MatSetup();
       this.eff.Apply(this.app.curRatio);
       break;
     case "brightnessanim":
       this.eff.brightnessanim=v;
       this.prim.Rebuild();
       this.prim.MeshSetup();
+      this.prim.MatSetup();
       this.eff.Apply(this.app.curRatio);
       break;
     case "hue1":
       this.eff.hue1=parseFloat(v);
       this.prim.Rebuild();
       this.prim.MeshSetup();
+      this.prim.MatSetup();
       this.eff.Apply(this.app.curRatio);
       break;
     case "hue2":
       this.eff.hue2=parseFloat(v);
       this.prim.Rebuild();
       this.prim.MeshSetup();
+      this.prim.MatSetup();
       this.eff.Apply(this.app.curRatio);
       break;
     case "hueanim":
       this.eff.hueanim=v;
       this.prim.Rebuild();
       this.prim.MeshSetup();
+      this.prim.MatSetup();
       this.eff.Apply(this.app.curRatio);
       break;
     case "mask1ena":
@@ -1838,12 +1843,54 @@ function App() {
   this.renderctx=this.rendercv.getContext("2d");
 //  document.getElementById("prevpane").appendChild(this.renderer.domElement );
   document.getElementById("prevpane").childNodes[1].style.border="1px solid #888";
+  this.texture={
+    "Aura":{file:"Aura.jpg",image:null,tex:null},
+    "Checkers":{file:"Checkers.bmp",image:null,tex:null},
+    "Circle":{file:"Circle.jpg",image:null,tex:null},
+    "MetalCircle":{file:"MetalCircle.png",image:null,tex:null},
+    "Coal":{file:"Coal.jpg",image:null,tex:null},
+    "Fabric":{file:"Fabric.bmp",image:null,tex:null},
+    "Hairline":{file:"Hairline.bmp",image:null,tex:null},
+    "HairlineV":{file:"HairlineV.bmp",image:null,tex:null},
+    "Hexagon":{file:"Hexagon.png",image:null,tex:null},
+    "Magma":{file:"Magma.bmp",image:null,tex:null},
+    "Mosaic":{file:"Mosaic.bmp",image:null,tex:null},
+    "Plant":{file:"Plant.png",image:null,tex:null},
+    "Plasma":{file:"Plasma.bmp",image:null,tex:null},
+    "PunchingMetal":{file:"PunchingMetal.png",image:null,tex:null},
+    "Radiation":{file:"Radiation.jpg",image:null,tex:null},
+    "Sand":{file:"Sand.png",image:null,tex:null},
+    "Scratch":{file:"Scratch.jpg",image:null,tex:null},
+    "chikuwa":{file:"chikuwa.jpg",image:null,tex:null}
+  };
+  this.texloadcnt=Object.keys(this.texture).length;
+  for(var i in this.texture){
+    var t=this.texture[i];
+    t.image=new Image();
+    t.image.src="texture/"+t.file;
+    t.image.t=t;
+    t.image.onload=function(){
+      this.t.tex=new THREE.Texture(this.t.image);
+      this.t.tex.wrapS=THREE.RepeatWrapping;
+      this.t.tex.wrapT=THREE.RepeatWrapping;
+      this.t.tex.needsUpdate=true;
+      if(--app.texloadcnt==0)
+        app.TexLoadComplete();
+//      document.body.appendChild(this.t.canvas);
+
+//      console.log(this.t.tex);
+//      console.log(app.texture["Sand"].tex);
+
+    }
+  }
+/*
   this.texloader=new THREE.TextureLoader();
   this.texture=[];
   this.texlist=[
     {name:"Aura",file:"Aura.jpg"},
     {name:"Checkers",file:"Checkers.bmp"},
     {name:"Circle",file:"Circle.jpg"},
+    {name:"MetalCircle",file:"MetalCircle.png"},
     {name:"Coal", file:"Coal.jpg"},
     {name:"Fabric",file:"Fabric.bmp"},
     {name:"Hairline",file:"Hairline.bmp"},
@@ -1865,6 +1912,12 @@ function App() {
     this.texture[this.texlist[i].name].tex.wrapS=THREE.RepeatWrapping;
     this.texture[this.texlist[i].name].tex.wrapT=THREE.RepeatWrapping;
   }
+  */
+/*
+  this.texture["Sand"].tex=new THREE.Texture(document.getElementById("texcanvas"));
+  this.texture["Sand"].tex.wrapS=THREE.RepeatWrapping;
+  this.texture["Sand"].tex.wrapT=THREE.RepeatWrapping;
+*/
   this.lighting=new Lighting(this);
   this.background=new Background(this);
 
@@ -2018,6 +2071,7 @@ function App() {
       Set(p.eff,"mask1ena",l.eff.mask1ena);
       p.prim.Rebuild();
       p.prim.MeshSetup();
+      p.prim.MatSetup();
       p.eff.Apply(0);
     }
     for(;i<app.maxlayer;++i){
@@ -2829,6 +2883,7 @@ window.addEventListener("DOMContentLoaded", Init, false);
   <option value="Aura">Aura</option>
   <option value="Checkers">Checkers</option>
   <option value="Circle">Circle</option>
+  <option value="MetalCircle">MetalCircle</option>
   <option value="Coal">Coal</option>
   <option value="Fabric">Fabric</option>
   <option value="Hairline">Hairline</option>
